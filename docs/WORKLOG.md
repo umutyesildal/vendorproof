@@ -175,6 +175,15 @@ Exports in repo: `n8n/vendor-assessment.json` (30 nodes), `n8n/report-retrieval.
 - **Validator fixture tests:** `tests/test-validator.js` runs `Validate R1` jsCode under mocked n8n globals — **10/10 pass** (T1, T3, T5, T6, T7, T9, T10, T11, T13, T20). Found + fixed: error-handler node-name extraction (`err.node` can be a string).
 - P2-02 → completed.
 
+### Iteration round 2 — Gmail live + more executions
+
+- **Gmail OAuth connected** (`Gmail account` cred `v9pqGKjKU1J6Ljr0`); both alert nodes enabled with fixed operator address on the live instance only (repo export keeps `OPERATOR@EXAMPLE.COM` placeholder — no PII committed).
+- **Exec 14 (error path, Gmail live):** bad form input → workflow error → Error Trigger → `workflow_failures` row + **real alert email sent** (`labelIds:["SENT"]`).
+- **Exec 12 (Lambda Labs):** `complete`, zero review flags — Operator Alert correctly not fired.
+- **Exec 15 (Etched):** `complete`, `normalized_match_audit` flagged (smart-quote normalized match — validator auditing as designed).
+- Follow-up round wired but not yet triggered in 3 runs — verifier's R1 plans are sufficient; gating is honest (no fake rounds).
+- Repo pushed: `github.com/umutyesildal/vendorproof` (initial commit 584f853).
+
 ### Remaining blockers (user)
 
 - **Gmail OAuth credential** must be created in n8n UI (browser flow), then enable the 2 disabled Gmail nodes + set operator email.
