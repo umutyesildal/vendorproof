@@ -308,11 +308,4 @@ User rejected first deck ("looks AI-generated"), asked for typography/color over
 - Result: 12 findings — 8 supported (verbatim evidence, exact+normalized matches), 4 insufficient_evidence. Standout: a claim sourced to a YouTube video the extractor couldn't read was auto-downgraded (`evidence_not_found_in_source`) — validator working as designed.
 - Report status `degraded`, `requires_review: true` — honest labeling, not a greenwash.
 - Captured `assets/vp-report-nvidia.png` from live `/form/vp-lookup` render; added deck slide 04b "Then we ran the sponsor" (slide count 7→8).
-
-## NVIDIA live run (exec 63) — recognizable-vendor demo asset
-
-- Submitted via real browser form: company `NVIDIA`, objective covering GPU supply/delivery, pricing power, CUDA lock-in, security/compliance.
-- Full pipeline ran: Planner, Collector, Verifier, follow-up round 2 (Collector R2 + Verifier R2), Assemble, Persist, Operator Alert (Gmail fired on requires_review).
-- Result: 12 findings — 8 supported (verbatim evidence, exact+normalized matches), 4 insufficient_evidence. Standout: a claim sourced to a YouTube video the extractor could not read was auto-downgraded (evidence_not_found_in_source) — validator working as designed.
-- Report status degraded, requires_review true — honest labeling.
-- Captured assets/vp-report-nvidia.png from live /form/vp-lookup render; added deck slide "Then we ran the sponsor" (slide count 7 to 8).
+- Post-mortem: the "no security/compliance coverage" gap was a collector bug, not a source gap. Tavily returned `nvidia.com/en-us/ai-trust-center/...` and Reuters supply-chain coverage, but `Max 10 URLs` kept only the first 10 items (= first 2 queries × 5 results), silently dropping queries 3–4 in both rounds (collector execs 65, 67). Fix tracked in the next entry.

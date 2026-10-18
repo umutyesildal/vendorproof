@@ -5,10 +5,10 @@ const code = fs.readFileSync('tests/validator.js', 'utf8');
 const SRC_A = { url: 'https://vendor.com/pricing', title: 'Pricing', content: 'Our Basic plan costs $10 per month. Enterprise pricing is custom. All plans include SSL.' };
 const SRC_B = { url: 'https://blog.example.com/review', title: 'Review', content: 'The vendor suffered a major outage in March, lasting six hours and affecting all regions.' };
 
-function run(modelReport, sources = [SRC_A, SRC_B]) {
+function run(modelReport, sources = [SRC_A, SRC_B], company = 'Vendor') {
   let result;
   const $input = { first: () => ({ json: { choices: [{ message: { content: JSON.stringify(modelReport) } }] } }) };
-  const $ = (name) => ({ first: () => ({ json: { sources, failed_results: [], company:'T', objective:'O' } }) });
+  const $ = (name) => ({ first: () => ({ json: { sources, failed_results: [], company, objective:'O' } }) });
   const fn = new Function('$input', '$', 'require', code);
   try { result = fn($input, $, require); } catch (e) { return { error: e.message }; }
   return result[0].json;
@@ -65,6 +65,31 @@ t('T13 insufficient stays insufficient', f(r).verification === 'insufficient_evi
 // T20 failed_results URL used as source → downgrade
 r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: 'https://failed.example.com/x', evidence: 'anything long enough here ok' })] }), [SRC_A]);
 t('T20 non-extracted URL → insufficient_evidence', f(r).verification === 'insufficient_evidence');
+
+// T21 verbatim quote but source never names the vendor → vendor_not_in_source
+const SRC_X = { url: 'https://docs.othercorp.io/spec', title: 'Spec sheet', content: 'The platform supports widget batching. Our Basic plan costs $10 per month.' };
+r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: SRC_X.url, evidence: 'Our Basic plan costs $10 per month.' })] }), [SRC_X]);
+t('T21 vendor unnamed in source → vendor_not_in_source', f(r).verification === 'insufficient_evidence' && f(r).validation.downgrade_reason === 'vendor_not_in_source' && r.review_reasons[0] === 'vendor_identity_unconfirmed');
+
+// T22 legal suffix stripped from company name → supported
+const SRC_ACME = { url: 'https://acme.example.com/about', title: 'About', content: 'Acme Robotics builds warehouse automation. Our Basic plan costs $10 per month.' };
+r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: SRC_ACME.url, evidence: 'Our Basic plan costs $10 per month.' })] }), [SRC_ACME], 'Acme Robotics GmbH');
+t('T22 legal suffix stripped → supported', f(r).verification === 'supported');
+
+// T23 case-insensitive vendor mention → supported
+const SRC_NV = { url: 'https://blog.example.com/gpus', title: 'GPU news', content: 'Nvidia ships data-center GPUs. Our Basic plan costs $10 per month.' };
+r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: SRC_NV.url, evidence: 'Our Basic plan costs $10 per month.' })] }), [SRC_NV], 'NVIDIA');
+t('T23 case-insensitive vendor → supported', f(r).verification === 'supported');
+
+// T24 cited URL differs only by scheme/www/query → loose match, extracted URL returned
+r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: 'http://www.vendor.com/pricing?utm_source=x' })] }), [SRC_A]);
+t('T24 loose URL match → supported, extracted URL kept', f(r).verification === 'supported' && f(r).validation.url_match_mode === 'loose' && f(r).source_url === SRC_A.url);
+
+// T25 two extracted URLs share the loose key → pick the one containing the quote
+const SRC_P = { url: 'https://vendor.com/a?x=1', title: 'Vendor page A', content: 'Vendor intro text with nothing quotable here at all.' };
+const SRC_P2 = { url: 'https://vendor.com/a?x=2', title: 'Vendor page B', content: 'Vendor detail text. Our Basic plan costs $10 per month.' };
+r = run(mk({ findings: [Object.assign(mk().findings[0], { source_url: 'https://vendor.com/a?utm_source=x', evidence: 'Our Basic plan costs $10 per month.' })] }), [SRC_P, SRC_P2]);
+t('T25 loose collision → quote-bearing source wins', f(r).verification === 'supported' && f(r).source_url === SRC_P2.url);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

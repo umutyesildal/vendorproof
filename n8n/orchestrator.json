@@ -598,13 +598,13 @@
             {
               "id": "f13",
               "name": "validator_version",
-              "value": "1.0.0",
+              "value": "1.1.0",
               "type": "string"
             },
             {
               "id": "f14",
               "name": "model",
-              "value": "MiniMaxAI/MiniMax-M3",
+              "value": "nvidia/Nemotron-3-Ultra-550b-a55b",
               "type": "string"
             },
             {

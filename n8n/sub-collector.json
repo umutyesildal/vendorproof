@@ -23,7 +23,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ query: $json.query, search_depth: 'basic', max_results: 5, include_answer: false, include_usage: true }) }}",
+        "body": "={{ JSON.stringify({ query: $json.query, search_depth: 'basic', max_results: Math.ceil(12 / $('When Executed by Another Workflow').all().length), exclude_domains: ['youtube.com','linkedin.com','scribd.com','facebook.com','x.com','twitter.com'], include_answer: false, include_usage: true }) }}",
         "options": {
           "timeout": 30000
         }
@@ -115,10 +115,10 @@
     },
     {
       "parameters": {
-        "maxItems": 10
+        "maxItems": 12
       },
       "id": "e6-limit",
-      "name": "Max 10 URLs",
+      "name": "Max 12 URLs",
       "type": "n8n-nodes-base.limit",
       "typeVersion": 1,
       "position": [
@@ -292,14 +292,14 @@
       "main": [
         [
           {
-            "node": "Max 10 URLs",
+            "node": "Max 12 URLs",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Max 10 URLs": {
+    "Max 12 URLs": {
       "main": [
         [
           {

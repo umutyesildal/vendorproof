@@ -7,6 +7,14 @@ const srcs = ctx.sources || [];
 const norm = u => { let x = String(u||'').toLowerCase().split('#')[0]; const [base,q] = x.split('?'); const q2 = q ? '?' + q.split('&').filter(p => !/^(utm_|fbclid|gclid|ref=|source=)/.test(p)).join('&') : ''; x = base + (q2 === '?' ? '' : q2); return x.replace(/\/$/, ''); };
 const map = new Map(srcs.map(s => [norm(s.url), s]));
 const canon = t => String(t||'').normalize('NFC').replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014\u2010\u2011\u2012]/g,'-').replace(/\u00A0/g,' ').replace(/\s+/g,' ');
+const LEGAL = /\b(gmbh|ag|inc|incorporated|ltd|limited|llc|plc|corp|corporation|co|sa|sas|bv|nv|ab|oy|srl|spa|kg|se)\b\.?/g;
+const flat = t => ' ' + String(t||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim() + ' ';
+const entity = flat(String(ctx.company||'').toLowerCase().replace(LEGAL,' ')).trim();
+const host = u => String(u||'').toLowerCase().replace(/^https?:\/\//,'').split(/[/?#]/)[0].replace(/^www\./,'');
+const mentionsVendor = s => !entity || flat((s.title||'') + ' ' + (s.content||'')).includes(' ' + entity + ' ') || host(s.url).replace(/[^a-z0-9]/g,'').includes(entity.replace(/ /g,''));
+const loose = u => host(u) + '/' + String(u||'').toLowerCase().replace(/^https?:\/\/[^/?#]+/,'').split(/[?#]/)[0].replace(/^\/+|\/+$/g,'');
+const looseMap = new Map(); srcs.forEach(s => { const k = loose(s.url); if (!looseMap.has(k)) looseMap.set(k, []); looseMap.get(k).push(s); });
+const pickLoose = f => { const c = looseMap.get(loose(f.source_url)) || []; return c.find(s => canon(s.content).includes(canon(f.evidence))) || c[0]; };
 const V = new Set(['supported','contradicted','insufficient_evidence']);
 const S = new Set(['info','low','medium','high','critical']);
 const MATERIAL = new Set(['breach','litigation','sanctions','fraud','security','reliability','compliance']);
@@ -14,7 +22,8 @@ let downgraded = 0, normalizedOnly = 0, retrievable = [];
 const findings = rep.findings.map(f => {
   const v = { original_state: f.verification, final_state: f.verification, url_match: false, evidence_match: 'none', downgrade_reason: 'none', severity_adjusted: false };
   if (!f.claim || !f.topic || !V.has(f.verification) || !S.has(f.severity)) { v.final_state='insufficient_evidence'; v.downgrade_reason='invalid_finding'; }
-  const src = map.get(norm(f.source_url));
+  const exactSrc = map.get(norm(f.source_url)); const src = exactSrc || (f.source_url ? pickLoose(f) : undefined);
+  v.url_match_mode = exactSrc ? 'exact' : (src ? 'loose' : 'none');
   const ev = String(f.evidence||'').trim();
   const badFormat = ev.length<20 || ev.length>2000 || /(\u2026|\.\.\.|\[\.\.\.\])/.test(ev);
   if (f.verification !== 'insufficient_evidence') {
@@ -25,6 +34,7 @@ const findings = rep.findings.map(f => {
         const normMatch = !exact && canon(src.content).includes(canon(ev));
         if (exact) v.evidence_match='exact'; else if (normMatch) v.evidence_match='normalized';
         else { v.final_state='insufficient_evidence'; v.downgrade_reason='evidence_not_found_in_source'; }
+        if ((exact || normMatch) && !mentionsVendor(src)) { v.final_state='insufficient_evidence'; v.downgrade_reason='vendor_not_in_source'; }
       }
     }
   }
@@ -32,10 +42,11 @@ const findings = rep.findings.map(f => {
   if (v.evidence_match === 'normalized') normalizedOnly++;
   if (v.final_state === 'contradicted' && ['info','low'].includes(f.severity)) { f.severity='medium'; v.severity_adjusted=true; }
   if (v.final_state === 'insufficient_evidence' && ['high','critical'].includes(f.severity) && !MATERIAL.has(f.topic)) { f.severity='medium'; v.severity_adjusted=true; }
-  return { ...f, verification: v.final_state, source_url: src ? f.source_url : '', source_title: src ? (f.source_title || src.title) : '', evidence: v.final_state==='insufficient_evidence'?'':ev, validation: v, compound: String(f.claim).length>300 };
+  return { ...f, verification: v.final_state, source_url: exactSrc ? f.source_url : (src ? src.url : ''), source_title: src ? (f.source_title || src.title) : '', evidence: v.final_state==='insufficient_evidence'?'':ev, validation: v, compound: String(f.claim).length>300 };
 });
 const materialInsuff = findings.filter(f => MATERIAL.has(f.topic) && f.verification==='insufficient_evidence').length;
 const reasons = [];
+if (findings.some(f=>f.validation.downgrade_reason==='vendor_not_in_source')) reasons.push('vendor_identity_unconfirmed');
 if (findings.some(f=>f.verification==='contradicted')) reasons.push('contradicted_finding');
 if (normalizedOnly) reasons.push('normalized_match_audit');
 if (downgraded>=2) reasons.push('downgrade_threshold');
