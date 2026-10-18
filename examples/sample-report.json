@@ -1,0 +1,278 @@
+{
+  "vendor": "Nebius",
+  "objective": "Evaluate pricing transparency, security posture, and service reliability of this cloud AI provider.",
+  "generated_at": "2026-10-18T13:52:20.490Z",
+  "status": "degraded",
+  "requires_review": true,
+  "review_reasons": [
+    "downgrade_threshold"
+  ],
+  "findings": [
+    {
+      "claim": "Nebius publishes detailed, line-item compute pricing in USD and ILS on its official documentation site, including per-GPU-hour rates for on-demand and preemptible SKUs.",
+      "topic": "pricing_transparency",
+      "verification": "insufficient_evidence",
+      "source_url": "https://docs.nebius.com/compute/resources/pricing",
+      "source_title": "Compute pricing in Nebius AI Cloud - Nebius AI Cloud",
+      "source_class": "first_party",
+      "evidence": "",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "insufficient_evidence",
+        "url_match": true,
+        "evidence_match": "none",
+        "downgrade_reason": "evidence_not_found_in_source",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius publishes per-GiB-per-730-hour pricing for Network SSD, Non-replicated SSD, IO M3 SSD, disk snapshots, and Shared Filesystem SSD in both USD and ILS.",
+      "topic": "pricing_transparency",
+      "verification": "supported",
+      "source_url": "https://docs.nebius.com/compute/resources/pricing",
+      "source_title": "Compute pricing in Nebius AI Cloud - Nebius AI Cloud",
+      "source_class": "first_party",
+      "evidence": "#### ​ Disks\n\n USD\n ILS\n\n| Item | Price per 1 GiB per 730 hours |\n --- |\n| Network SSD disk | $0.071 |\n| Network SSD Non-replicated disk | $0.053 |\n| Network SSD IO M3 disk | $0.118 |\n\n| Item | Price per 1 GiB per 730 hours |\n --- |\n| Network SSD disk | ₪0.221 |\n| Network SSD Non-replicated disk | ₪0.164 |\n| Network SSD IO M3 disk | ₪0.366 |",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius offers on-demand and preemptible VMs, with reserved pricing available only by contacting sales.",
+      "topic": "pricing_transparency",
+      "verification": "insufficient_evidence",
+      "source_url": "https://nebius.com/compute",
+      "source_title": "Compute — GPU and CPU infrastructure for AI on Nebius",
+      "source_class": "first_party",
+      "evidence": "",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "insufficient_evidence",
+        "url_match": true,
+        "evidence_match": "none",
+        "downgrade_reason": "evidence_format_invalid",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "A third-party Medium article claims Nebius offers H100 GPUs at $2.00 per hour, but this figure is not corroborated by Nebius's own pricing documentation in the supplied sources.",
+      "topic": "pricing_transparency",
+      "verification": "insufficient_evidence",
+      "source_url": "",
+      "source_title": "",
+      "source_class": "unknown",
+      "evidence": "",
+      "severity": "info",
+      "validation": {
+        "original_state": "insufficient_evidence",
+        "final_state": "insufficient_evidence",
+        "url_match": false,
+        "evidence_match": "none",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius holds ISO/IEC 27001:2022 certification, audited by an independent third party, covering an Information Security Management System (ISMS).",
+      "topic": "security_posture",
+      "verification": "supported",
+      "source_url": "https://nebius.com/trust-center/iso-27001",
+      "source_title": "ISO/IEC 27001",
+      "source_class": "first_party",
+      "evidence": "Nebius is certified for compliance with ISO/IEC 27001:2022, a globally recognized standard for information security management.\n\nThis certification, conducted by an independent external third-party auditor, demonstrates our commitment to maintaining robust security practices across all levels of our organization.\n\nAt the core of this certification is our Information Security Management System (ISMS), which defines how Nebius continuously manages information security in a comprehensive and systematic way.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius holds ISO/IEC 27701:2019 certification as both a PII controller and a PII processor, extending its ISMS into a Privacy Information Management System (PIMS).",
+      "topic": "security_posture",
+      "verification": "supported",
+      "source_url": "https://nebius.com/trust-center/iso-27701",
+      "source_title": "ISO/IEC 27701",
+      "source_class": "first_party",
+      "evidence": "Nebius is certified for compliance with ISO/IEC 27701:2019, the international standard for Privacy Information Management Systems (PIMS).\n\nThis certification extends our ISO/IEC 27001 program with privacy-specific requirements and controls for managing personally identifiable information (PII).\n\nNebius has been certified as both a PII controller and a PII processor, reflecting our responsibility to protect personal data across different service and operational contexts.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius has obtained SOC 2 Type II attestation from Deloitte, with the report also covering HIPAA controls, spanning Nebius AI Cloud, AI Studio, and TractoAI.",
+      "topic": "security_posture",
+      "verification": "supported",
+      "source_url": "https://nebius.com/blog/posts/soc-2-type-ii-hipaa-iso-27001-enterprise-security-standards",
+      "source_title": "Nebius meets enterprise-level security standards: ISO 27001, SOC 2 Type II including HIPAA and more",
+      "source_class": "first_party",
+      "evidence": "The resulting SOC 2 Type II report by Deloitte provides an independent attestation of our controls. By signing the necessary NDA and consulting the report, customers can rest assured that Nebius operates securely and dependably. Spanning Nebius AI Cloud, AI Studio and TractoAI, the regular, independent audits attest our systems support responsible and safe AI development, with reliable service delivery.\n\nSOC 2 Type II also includes a section that confirms compliance with the Health Insurance Portability and Accountability Act (HIPAA).",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius is certified to ISO 22301 for business continuity management, enabling it to anticipate, withstand, and recover from disruptive events.",
+      "topic": "service_reliability",
+      "verification": "supported",
+      "source_url": "https://nebius.com/blog/posts/soc-2-type-ii-hipaa-iso-27001-enterprise-security-standards",
+      "source_title": "Nebius meets enterprise-level security standards: ISO 27001, SOC 2 Type II including HIPAA and more",
+      "source_class": "first_party",
+      "evidence": "### ISO 22301: Ensuring service resilienceISO 22301: Ensuring service resilience\n\nThe ISO 22301 certification demonstrates that Nebius can anticipate, withstand and recover from disruptive events, ensuring our AI cloud services remain available and reliable even under challenging circumstances.\n\nAs confirmed by a third-party audit, our Business Continuity Management System (BCMS) meets globally recognized standards. Built on proactive risk assessment and rigorous testing, our BCMS enables us to coordinate rapid responses during disruptions, minimize the impact of incidents and improve our continuity processes to stay resilient against evolving threats.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius states it complies with the EU Digital Operational Resilience Act (DORA) for financial-sector customers, as confirmed by a third-party audit.",
+      "topic": "security_posture",
+      "verification": "supported",
+      "source_url": "https://nebius.com/blog/posts/soc-2-type-ii-hipaa-iso-27001-enterprise-security-standards",
+      "source_title": "Nebius meets enterprise-level security standards: ISO 27001, SOC 2 Type II including HIPAA and more",
+      "source_class": "first_party",
+      "evidence": "As an AI cloud infrastructure provider to regulated financial organizations, Nebius strictly complies with the Digital Operational Resilience Act (DORA) standards. As proven by this third-party audit, Nebius meets EU-level requirements to safeguard risk management, incident response, business continuity and governance in the financial sector. This compliance milestone confirms Nebius delivers uninterrupted, secure services under strict oversight.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius AI Cloud 3.0 'Aether' introduces automated active and passive health checks with automatic node repair, plus storage performance enhancements, as part of reliability improvements.",
+      "topic": "service_reliability",
+      "verification": "supported",
+      "source_url": "https://www.businesswire.com/news/home/20251016822814/en/Nebius-Introduces-Nebius-AI-Cloud-3.0-Aether-Delivering-Enterprise-Grade-Security-Compliance-and-Control-for-AI-Deployment-at-Scale",
+      "source_title": "Nebius Introduces Nebius AI Cloud 3.0 “Aether”, Delivering Enterprise-Grade Security, Compliance, and Control for AI Deployment at Scale",
+      "source_class": "first_party",
+      "evidence": "Reliability & performance\n\n Automated active and passive health checks with automatic node repair\n Object and file storage performance enhancements (third-party and native options)\n NVIDIA Exemplar Cloud on NVIDIA HGX B200\n Leading results in MLCommons MLPerf® Inference v5.1 benchmarks with NVIDIA GB200 NVL72 and NVIDIA HGX NVIDIA B200 systems",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius achieved leading results in the MLPerf Inference v5.1 benchmarks with NVIDIA GB200 NVL72 and NVIDIA HGX B200 systems, and is one of the first NVIDIA Exemplar Clouds on NVIDIA HGX H200.",
+      "topic": "service_reliability",
+      "verification": "supported",
+      "source_url": "https://www.businesswire.com/news/home/20251016822814/en/Nebius-Introduces-Nebius-AI-Cloud-3.0-Aether-Delivering-Enterprise-Grade-Security-Compliance-and-Control-for-AI-Deployment-at-Scale",
+      "source_title": "Nebius Introduces Nebius AI Cloud 3.0 “Aether”, Delivering Enterprise-Grade Security, Compliance, and Control for AI Deployment at Scale",
+      "source_class": "first_party",
+      "evidence": "Performance and reliability remain foundational. Nebius recorded leading results in the MLPerf® Inference v5.1 benchmarks with NVIDIA GB200 NVL72 and NVIDIA HGX™ B200 systems and became one of the first NVIDIA Exemplar Clouds, achieving NVIDIA performance standards for large-scale training workloads on NVIDIA HGX H200. The Aether release adds automated health monitoring with proactive issue detection and significant storage performance upgrades to ensure enterprise-scale stability.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    },
+    {
+      "claim": "Nebius compute clusters use NVIDIA Quantum-2 InfiniBand fabric for non-blocking interconnect, supporting thousand-GPU clusters.",
+      "topic": "service_reliability",
+      "verification": "supported",
+      "source_url": "https://nebius.com/compute",
+      "source_title": "Compute — GPU and CPU infrastructure for AI on Nebius",
+      "source_class": "first_party",
+      "evidence": "From single-node instances to thousand-GPU clusters with optimized non-blocking NVIDIA Quantum-2 InfiniBand fabric — Nebius provides accelerated compute to meet the demands of every AI workload.",
+      "severity": "info",
+      "validation": {
+        "original_state": "supported",
+        "final_state": "supported",
+        "url_match": true,
+        "evidence_match": "exact",
+        "downgrade_reason": "none",
+        "severity_adjusted": false
+      },
+      "compound": false
+    }
+  ],
+  "assessment": "Nebius demonstrates strong pricing transparency via a public, line-item compute pricing page (USD and ILS) covering GPU SKUs, disks, snapshots, and shared filesystems, though reserved/committed pricing requires contacting sales. Security posture is well-documented with ISO/IEC 27001, ISO/IEC 27701, SOC 2 Type II (Deloitte, including HIPAA), ISO 22301, NIS2, and DORA compliance claims. Service reliability is supported by NVIDIA Exemplar Cloud status, MLPerf Inference v5.1 benchmark results, and the Aether release's automated health checks and node repair. Gaps: no public SLA, uptime history, or incident postmortems in the supplied sources; the third-party Medium article's $2/hr H100 claim is unverified against first-party docs.",
+  "trace": [
+    {
+      "round": 0,
+      "action": "search",
+      "query": "Nebius AI cloud pricing per GPU instance official site",
+      "result_count": 5
+    },
+    {
+      "round": 0,
+      "action": "search",
+      "query": "Nebius AI security compliance SOC2 ISO 27001 certifications",
+      "result_count": 5
+    },
+    {
+      "round": 0,
+      "action": "search",
+      "query": "Nebius AI status page uptime incident history",
+      "result_count": 5
+    },
+    {
+      "round": 0,
+      "action": "search",
+      "query": "Nebius AI cloud platform review reliability performance independent",
+      "result_count": 5
+    }
+  ],
+  "usage": {
+    "model_calls": 2,
+    "search_calls": 4,
+    "extract_calls": 1,
+    "research_rounds": 1
+  },
+  "validator_version": "1.0.0",
+  "model": "MiniMaxAI/MiniMax-M3",
+  "dedupe_key": "ea25f79bea486eaf3d8e3f9ab166ab6f",
+  "report_version": "v1",
+  "cache_hit": false
+}

@@ -1,0 +1,134 @@
+{
+  "name": "VendorProof — Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c01-error",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nconst err = e.execution?.error || {};\nconst crypto = require('crypto');\nconst workflow_id = String(e.workflow?.id || 'unknown');\nconst node = String(typeof err.node === 'string' ? err.node : (err.node?.name || err.node || 'unknown'));\nconst http_status = Number(err.httpCode || 0) || 0;\nconst failure_key = crypto.createHash('sha256').update(workflow_id + '|' + node + '|' + new Date().toISOString().slice(0, 13)).digest('hex').slice(0, 24);\nreturn [{ json: {\n  failure_key,\n  workflow_id,\n  workflow_name: String(e.workflow?.name || 'unknown'),\n  node,\n  error_type: String(err.description || err.message || 'unknown_error').slice(0, 200),\n  http_status,\n  execution_id: String(e.execution?.id || ''),\n  execution_url: String(e.execution?.url || ''),\n  failed_at: new Date().toISOString(),\n  status: 'logged'\n} }];"
+      },
+      "id": "c02-normalize",
+      "name": "Normalize Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "PzL8Rm0qXrhtrVYH",
+          "mode": "list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "failure_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.failure_key }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "failure_key": "={{ $json.failure_key }}",
+            "workflow_id": "={{ $json.workflow_id }}",
+            "workflow_name": "={{ $json.workflow_name }}",
+            "node": "={{ $json.node }}",
+            "error_type": "={{ $json.error_type }}",
+            "http_status": "={{ $json.http_status }}",
+            "execution_id": "={{ $json.execution_id }}",
+            "execution_url": "={{ $json.execution_url }}",
+            "failed_at": "={{ $json.failed_at }}",
+            "status": "logged"
+          }
+        }
+      },
+      "id": "c03-log",
+      "name": "Log Failure",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "OPERATOR@EXAMPLE.COM",
+        "subject": "=VendorProof workflow failure: {{ $json.workflow_name }}",
+        "emailType": "text",
+        "message": "={{ 'Workflow: ' + $json.workflow_name + '\\nNode: ' + $json.node + '\\nError: ' + $json.error_type + '\\nHTTP: ' + ($json.http_status || 'n/a') + '\\nExecution: ' + $json.execution_url + '\\nTime: ' + $json.failed_at }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "c04-email",
+      "name": "Alert Operator",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        60,
+        300
+      ],
+      "webhookId": "vp-err-mail",
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Error": {
+      "main": [
+        [
+          {
+            "node": "Log Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Failure": {
+      "main": [
+        [
+          {
+            "node": "Alert Operator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+node_modules/
+*.log
+*.pem
+*.key
+*.p12
+id_rsa*
+*.credentials.json
+*.har
+.n8n/
+secrets/
+n8n/credentials/
+n8n/backups/

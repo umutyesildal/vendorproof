@@ -1,0 +1,170 @@
+{
+  "name": "VendorProof — Report Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "VendorProof — Report lookup",
+        "formDescription": "Retrieve a completed vendor assessment. Enter the same company and research objective used for the original request.",
+        "responseMode": "lastNode",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Company",
+              "fieldName": "company",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Research objective",
+              "fieldName": "objective",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Get report"
+        }
+      },
+      "id": "b01-form",
+      "name": "Lookup Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -900,
+        300
+      ],
+      "webhookId": "vp-lookup"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst company = String(input.company || input['Company'] || '').trim().replace(/\\s+/g, ' ');\nconst objective = String(input.objective || input['Research objective'] || '').trim().replace(/\\s+/g, ' ');\nif (company.length < 2 || company.length > 200) throw new Error('Company must be 2-200 characters.');\nif (objective.length < 20 || objective.length > 2000) throw new Error('Objective must be 20-2000 characters.');\nconst crypto = require('crypto');\nconst dedupe_key = crypto.createHash('sha256').update(company.toLowerCase() + '|' + objective.toLowerCase() + '|v1').digest('hex').slice(0, 32);\nreturn [{ json: { company, objective, dedupe_key } }];"
+      },
+      "id": "b02-normalize",
+      "name": "Normalize + Fingerprint",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "neu26q9Q8yfqlkxS",
+          "mode": "list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "dedupe_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.dedupe_key }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "completed"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "id": "b03-get",
+      "name": "Get Report Row",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -460,
+        300
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const row = $input.first().json;\nconst esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;');\nif (!row.report_json) {\n  return [{ json: { html: '<h1>No report found</h1><p>No completed assessment exists for this company and objective yet. If you recently submitted it, research may still be running — try again in a few minutes.</p>' } }];\n}\nconst rep = JSON.parse(row.report_json);\nconst badge = { supported: 'color: #166534', contradicted: 'color: #991b1b', insufficient_evidence: 'color: #92400e' };\nconst rows = rep.findings.map(f =>\n  '<div style=\"border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin:10px 0\">' +\n  '<strong>' + esc(f.claim) + '</strong>' +\n  '<div style=\"margin-top:6px;font-size:13px\"><span style=\"' + (badge[f.verification]||'') + '\"><b>' + esc(f.verification) + '</b></span>' +\n  ' &middot; ' + esc(f.topic) + ' &middot; severity: ' + esc(f.severity) + '</div>' +\n  (f.source_url ? '<div style=\"margin-top:6px;font-size:13px\"><a href=\"' + esc(f.source_url) + '\">' + esc(f.source_title || f.source_url) + '</a></div>' : '<div style=\"margin-top:6px;font-size:13px;color:#6b7280\">No source</div>') +\n  (f.evidence ? '<blockquote style=\"margin:8px 0 0;padding-left:10px;border-left:3px solid #d1d5db;color:#4b5563;font-size:13px\">' + esc(f.evidence) + '</blockquote>' : '') +\n  '</div>'\n).join('');\nconst html = '<h1>VendorProof Report</h1><h2>' + esc(rep.vendor) + '</h2>' +\n  '<p style=\"color:#6b7280;font-size:14px\">' + esc(rep.objective) + '</p>' +\n  '<p>Status: <b>' + esc(rep.status) + '</b> &middot; Review required: <b>' + (rep.requires_review ? 'YES' : 'no') + '</b> &middot; ' + esc(rep.generated_at) + '</p>' +\n  (rep.review_reasons && rep.review_reasons.length ? '<p style=\"color:#991b1b\">Review reasons: ' + esc(rep.review_reasons.join(', ')) + '</p>' : '') +\n  '<h3>Assessment</h3><p>' + esc(rep.assessment) + '</p><h3>Findings (' + rep.findings.length + ')</h3>' + rows;\nreturn [{ json: { html } }];"
+      },
+      "id": "b04-render",
+      "name": "Render Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "showText",
+        "responseText": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "b05-page",
+      "name": "Show Report Page",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Lookup Form": {
+      "main": [
+        [
+          {
+            "node": "Normalize + Fingerprint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize + Fingerprint": {
+      "main": [
+        [
+          {
+            "node": "Get Report Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Report Row": {
+      "main": [
+        [
+          {
+            "node": "Render Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render Report": {
+      "main": [
+        [
+          {
+            "node": "Show Report Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
