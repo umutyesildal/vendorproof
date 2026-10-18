@@ -259,6 +259,32 @@ Create pitch deck after system validation.
 - 2-minute demo script rehearsal (draft in scope audit).
 - Submission channel + partner-challenge names from organizers.
 
+## 2026-10-18 — Deck redesign + real n8n artifacts
+
+### Requested scope
+
+User rejected first deck ("looks AI-generated"), asked for typography/color overhaul, real n8n visuals, and n8n side-track focus. Minimum 4 subagents required.
+
+### Work performed
+
+- Ran 4 parallel research subagents: anti-slop critique of old deck, typography/visual spec, Tech Europe judging research, hackathon pitch structure.
+- `design-taste` skill invoked; direction chosen: **Editorial Ledger** — Newsreader serif display + Inter Tight body + IBM Plex Mono data, ink `#1A1A19`, vermilion accent `#D13415` (<5% coverage), hairline rules only, no cards/shadows/gradients.
+- Rebuilt `pitch-deck.html` from 8 template slides → 7 editorial slides. Killed: kicker+divider rhythm, 3-card feature grid, 4-metric row, flexbox flow pills, badge row, blue-600 accent.
+- Slide 4 (proof) is now the single dark slide — Nimbus fake-vendor result as ledger artifact.
+- Slide 5 embeds the **real n8n orchestrator canvas screenshot** captured via Orca computer-use from the live instance: `assets/n8n-orchestrator.png` + tight/wide crops.
+
+### Judging intel (verified on logged-in dashboard + research)
+
+- Tech Europe format: Stage 1 pre-selection on **2-min video + public repo** (creativity + technical complexity + partner-tech bonus) → Stage 2: **5-min live finalist pitch**, jury picks top 3. Submission ≤18:30–19:00 (verify on the event page).
+- Min partner tech requirement seen on sibling event page; prize pool includes Token Factory/Cloud credits + Tavily credits.
+- Nebius-event side-challenge list not yet confirmed (dashboard navigation fought active Chrome use).
+
+### Outstanding captures (Chrome was in active use)
+
+- Evidence Collector canvas (native-node fan-out shot)
+- A green execution view
+- Rendered report page from `/form/vp-lookup`
+
 ```md
 ## YYYY-MM-DD — Short title
 

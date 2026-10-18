@@ -1,397 +1,348 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VendorProof — Pitch Deck</title>
-  <style>
-    :root {
-      --c-bg: #ffffff;
-      --c-bg-alt: #fafafa;
-      --c-bg-card: #f6f6f7;
-      --c-surface: #efefef;
-      --c-border: rgba(0,0,0,0.09);
-      --c-primary: #1c1c1e;
-      --c-primary-dim: rgba(28,28,30,0.06);
-      --c-accent: #2563eb;
-      --c-accent-dim: rgba(37,99,235,0.08);
-      --c-danger: #dc2626;
-      --c-warning: #d97706;
-      --c-text: #1c1c1e;
-      --c-text-secondary: rgba(28,28,30,0.68);
-      --c-text-muted: rgba(28,28,30,0.42);
-      --f-hero: 96px;
-      --f-h1: 64px;
-      --f-h2: 48px;
-      --f-h3: 34px;
-      --f-body: 26px;
-      --f-small: 21px;
-      --f-caption: 17px;
-      --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
-      --s-xs: 8px; --s-sm: 16px; --s-md: 32px; --s-lg: 48px; --s-xl: 64px;
-      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-      --duration-enter: 0.6s;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; background: var(--c-bg); color: var(--c-text); }
-    .deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
-    .slide {
-      position: absolute; inset: 0; display: flex; flex-direction: column;
-      justify-content: center; padding: 80px 100px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.5s var(--ease-out);
-      font-family: var(--font-display); background: var(--c-bg);
-    }
-    .slide.active { opacity: 1; pointer-events: auto; }
-    .slide.active .animate-in { animation: slideUp var(--duration-enter) var(--ease-out) both; }
-    .slide.active .animate-in:nth-child(1) { animation-delay: 0s; }
-    .slide.active .animate-in:nth-child(2) { animation-delay: 0.08s; }
-    .slide.active .animate-in:nth-child(3) { animation-delay: 0.16s; }
-    .slide.active .animate-in:nth-child(4) { animation-delay: 0.24s; }
-    .slide.active .animate-in:nth-child(5) { animation-delay: 0.32s; }
-    .slide.active .animate-in:nth-child(6) { animation-delay: 0.4s; }
-    .slide.active .animate-in:nth-child(7) { animation-delay: 0.48s; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-    .hero { font-size: var(--f-hero); font-weight: 900; letter-spacing: -3px; line-height: 1.05; }
-    .h1 { font-size: var(--f-h1); font-weight: 800; letter-spacing: -2px; line-height: 1.1; }
-    .h2 { font-size: var(--f-h2); font-weight: 700; letter-spacing: -1px; line-height: 1.2; }
-    .h3 { font-size: var(--f-h3); font-weight: 600; line-height: 1.3; }
-    .body { font-size: var(--f-body); line-height: 1.5; color: var(--c-text-secondary); }
-    .small { font-size: var(--f-small); line-height: 1.5; color: var(--c-text-secondary); }
-    .caption { font-size: var(--f-caption); font-weight: 600; color: var(--c-text-muted); letter-spacing: 2px; text-transform: uppercase; }
-    .mono { font-family: var(--font-mono); }
-    .text-accent { color: var(--c-accent); }
-    .text-muted { color: var(--c-text-muted); }
-    .text-danger { color: var(--c-danger); }
-    .text-emphasis { color: var(--c-accent); font-weight: 800; }
-    .flex { display: flex; } .flex-col { flex-direction: column; }
-    .items-center { align-items: center; } .justify-between { justify-content: space-between; }
-    .gap-sm { gap: var(--s-sm); } .gap-md { gap: var(--s-md); } .gap-lg { gap: var(--s-lg); } .gap-xl { gap: var(--s-xl); }
-    .flex-1 { flex: 1; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-lg); }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s-md); }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-md); }
-    .card { background: var(--c-bg-card); border: 1px solid var(--c-border); border-radius: 16px; padding: var(--s-lg); }
-    .card-glow { background: var(--c-bg-card); border: 1px solid var(--c-accent); border-radius: 16px; padding: var(--s-lg); box-shadow: 0 0 40px rgba(37,99,235,0.08); }
-    .metric-card { text-align: center; padding: var(--s-lg); }
-    .metric-value { font-size: 72px; font-weight: 900; color: var(--c-accent); letter-spacing: -2px; line-height: 1; }
-    .metric-label { font-size: var(--f-small); color: var(--c-text-muted); margin-top: var(--s-xs); font-weight: 500; }
-    .badge { display: inline-block; padding: 6px 16px; border-radius: 100px; font-size: var(--f-caption); font-weight: 600; letter-spacing: 1px; }
-    .badge-primary { background: var(--c-primary-dim); color: var(--c-primary); }
-    .badge-accent { background: var(--c-accent-dim); color: var(--c-accent); }
-    .badge-outline { border: 1px solid var(--c-border); color: var(--c-text-secondary); }
-    .divider { width: 64px; height: 3px; border-radius: 2px; background: var(--c-accent); opacity: 0.7; margin: var(--s-md) 0; }
-    .bullet-list { list-style: none; }
-    .bullet-list li { padding: var(--s-sm) 0; padding-left: var(--s-md); position: relative; font-size: var(--f-body); color: var(--c-text-secondary); border-bottom: 1px solid var(--c-border); }
-    .bullet-list li:last-child { border-bottom: none; }
-    .bullet-list li::before { content: ''; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--c-accent); transform: translateY(-50%); }
-    .comparison-table { width: 100%; border-collapse: collapse; }
-    .comparison-table th { text-align: left; padding: var(--s-sm) var(--s-md); font-size: var(--f-small); color: var(--c-text-muted); border-bottom: 1px solid var(--c-border); font-weight: 600; }
-    .comparison-table td { padding: var(--s-sm) var(--s-md); font-size: var(--f-body); border-bottom: 1px solid var(--c-border); color: var(--c-text-secondary); }
-    .comparison-table tr.highlight td { color: var(--c-text); background: var(--c-accent-dim); font-weight: 600; }
-    .check { color: var(--c-accent); font-weight: 700; }
-    .cross { color: var(--c-text-muted); }
-    .bg-alt { background: var(--c-bg-alt); }
-    .flow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .flow-node { background: var(--c-bg-card); border: 1px solid var(--c-border); border-radius: 12px; padding: 18px 26px; font-size: var(--f-small); font-weight: 600; }
-    .flow-node.sub { border-color: var(--c-accent); background: var(--c-accent-dim); }
-    .flow-arrow { color: var(--c-text-muted); font-size: 24px; font-weight: 300; }
-    .notes { display: none; position: fixed; bottom: 60px; left: 40px; right: 40px; background: rgba(255,255,255,0.97); border: 1px solid var(--c-border); border-radius: 12px; padding: 20px 24px; font-size: 16px; color: var(--c-text-secondary); line-height: 1.6; z-index: 200; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
-    .notes.visible { display: block; }
-    .notes-label { font-size: 12px; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
-    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 40px; background: linear-gradient(0deg, rgba(255,255,255,0.96) 0%, transparent 100%); z-index: 100; opacity: 0; transition: opacity 0.3s; }
-    .deck:hover .nav-bar { opacity: 1; }
-    .nav-counter { font-size: 16px; color: var(--c-text-muted); font-family: var(--font-mono); }
-    .nav-progress { flex: 1; max-width: 200px; height: 3px; border-radius: 2px; background: rgba(0,0,0,0.08); margin: 0 24px; }
-    .nav-progress-fill { height: 100%; border-radius: 2px; background: var(--c-accent); transition: width 0.3s var(--ease-out); }
-    .nav-btn { background: none; border: 1px solid var(--c-border); color: var(--c-text-secondary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: var(--font-display); }
-    .nav-btn:hover { border-color: var(--c-accent); color: var(--c-text); }
-    @media print {
-      .deck { overflow: visible; }
-      .slide { position: relative; opacity: 1; pointer-events: auto; page-break-after: always; height: 100vh; }
-      .nav-bar, .notes { display: none !important; }
-      .animate-in { animation: none !important; opacity: 1 !important; transform: none !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VendorProof — Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1A1A19;
+    --ink-soft: #44443F;
+    --muted: #6E6E6A;
+    --hairline: #E8E8E6;
+    --bg: #FFFFFF;
+    --paper: #FBFBFA;
+    --accent: #D13415;           /* vermilion — the audit mark */
+    --accent-tint: #FAF0ED;
+    --serif: 'Newsreader', Georgia, serif;
+    --sans: 'Inter Tight', -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', 'SF Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); }
+
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    padding: 72px 96px 80px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s ease;
+    font-family: var(--sans);
+    background: var(--bg);
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide.dark { background: #141412; color: #F2F1EC; }
+  .slide.dark .rule { border-color: rgba(242,241,236,0.14); }
+  .slide.dark .muted { color: rgba(242,241,236,0.5); }
+  .slide.dark td { border-color: rgba(242,241,236,0.14); color: rgba(242,241,236,0.75); }
+  .slide.dark th { color: rgba(242,241,236,0.45); border-color: rgba(242,241,236,0.2); }
+
+  /* every slide: mono eyebrow top-left, page number bottom-right */
+  .eyebrow {
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.18em;
+    color: var(--muted); text-transform: uppercase;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 56px; flex: none;
+  }
+  .eyebrow::before { content: ''; width: 7px; height: 7px; background: var(--accent); display: inline-block; }
+  .pagenum {
+    position: absolute; bottom: 36px; right: 96px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.1em;
+  }
+  .footer-left {
+    position: absolute; bottom: 36px; left: 96px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.06em;
+  }
+
+  .serif { font-family: var(--serif); font-weight: 400; letter-spacing: -0.02em; }
+  .display { font-family: var(--serif); font-weight: 400; font-size: clamp(56px, 6.4vw, 92px); line-height: 1.02; letter-spacing: -0.025em; }
+  .headline { font-family: var(--serif); font-weight: 400; font-size: clamp(40px, 4.4vw, 62px); line-height: 1.08; letter-spacing: -0.02em; max-width: 20ch; }
+  .headline em, .display em { font-style: italic; }
+  .body { font-size: 19px; font-weight: 400; line-height: 1.55; color: var(--ink-soft); max-width: 62ch; }
+  .small { font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .mono { font-family: var(--mono); }
+  .rule { border: none; border-top: 1px solid var(--hairline); }
+  .accent { color: var(--accent); }
+
+  .col { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+
+  /* ledger table */
+  table.ledger { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .ledger th {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted); text-align: left; font-weight: 500;
+    padding: 10px 20px 10px 0; border-bottom: 1px solid var(--ink);
+  }
+  .dark .ledger th { border-bottom-color: rgba(242,241,236,0.6); }
+  .ledger td {
+    font-size: 15px; line-height: 1.45; color: var(--ink-soft);
+    padding: 14px 20px 14px 0; border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+  .verdict { font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; white-space: nowrap; }
+  .verdict.bad { color: var(--accent); }
+  .verdict.good { color: #1E5B3E; }
+  .dark .verdict.good { color: #7FB08E; }
+
+  /* enter animation — subtle fade only */
+  .slide.active .in { animation: fadeIn 0.55s ease both; }
+  .slide.active .in.d1 { animation-delay: 0.08s; }
+  .slide.active .in.d2 { animation-delay: 0.16s; }
+  .slide.active .in.d3 { animation-delay: 0.24s; }
+  .slide.active .in.d4 { animation-delay: 0.34s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* notes */
+  .notes {
+    display: none; position: fixed; bottom: 56px; left: 96px; right: 96px;
+    background: rgba(255,255,255,0.97); border: 1px solid var(--hairline);
+    padding: 18px 22px; font-size: 14px; color: var(--ink-soft);
+    line-height: 1.6; z-index: 200; max-height: 180px; overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  }
+  .dark .notes { background: rgba(20,20,18,0.97); border-color: rgba(242,241,236,0.2); color: rgba(242,241,236,0.8); }
+  .notes.visible { display: block; }
+  .notes b { font-family: var(--mono); font-size: 11px; letter-spacing: 0.15em; color: var(--accent); display: block; margin-bottom: 6px; }
+
+  /* nav */
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 16px; padding: 14px; opacity: 0; transition: opacity 0.25s; z-index: 100; }
+  .deck:hover .nav { opacity: 1; }
+  .nav button { background: none; border: none; font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer; letter-spacing: 0.08em; }
+  .nav button:hover { color: var(--ink); }
+
+  @media print {
+    .deck { overflow: visible; }
+    .slide { position: relative; opacity: 1; pointer-events: auto; page-break-after: always; height: 100vh; }
+    .nav, .notes { display: none !important; }
+    .in { animation: none !important; opacity: 1 !important; }
+  }
+</style>
 </head>
 <body>
-  <div class="deck" id="deck">
+<div class="deck" id="deck">
 
-    <!-- 1. TITLE -->
-    <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
-      <h1 class="hero animate-in">Vendor<span class="text-accent">Proof</span></h1>
-      <p class="h3 animate-in" style="color: var(--c-text-secondary); margin-top: 24px; max-width: 700px;">
-        Research once. Verify every claim. Monitor what changes.
+  <!-- 01 — COVER -->
+  <div class="slide">
+    <div class="eyebrow">Nebius Build Week × NVIDIA — Berlin</div>
+    <div class="col" style="justify-content: flex-start; padding-top: 8vh;">
+      <h1 class="display in">VendorProof</h1>
+      <hr class="rule in d1" style="margin: 40px 0 32px; width: 100%; max-width: 560px;">
+      <p class="headline in d2" style="font-size: clamp(26px, 2.6vw, 38px); color: var(--ink-soft);">
+        Research once. Verify <em>every</em> claim.<br>Flag what can't be proven.
       </p>
-      <div class="animate-in" style="margin-top: 48px; display: flex; gap: 16px;">
-        <span class="badge badge-accent">Tavily Agentic Deep Research</span>
-        <span class="badge badge-outline">n8n Award</span>
-        <span class="badge badge-primary">Nebius × NVIDIA Berlin</span>
-      </div>
-      <div class="notes">
-        Bar test: "VendorProof researches a vendor for you — then proves every claim against the actual source before you see it."
-        One breath. Let the badges do the talking.
-      </div>
     </div>
+    <div class="footer-left">UMUT YESILDAL — SOLO</div>
+    <div class="pagenum">01 / 07</div>
+    <div class="notes"><b>OPEN — 10s</b>"VendorProof researches a vendor for you — then proves every claim against the actual source before you're allowed to see it." Stop talking. Next slide.</div>
+  </div>
 
-    <!-- 2. PROBLEM -->
-    <div class="slide bg-alt">
-      <span class="caption animate-in">The Problem</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px; max-width: 950px;">
-        AI research tools <span class="text-danger">invent citations.</span>
-      </h1>
-      <div class="divider animate-in"></div>
-      <ul class="bullet-list animate-in" style="max-width: 800px;">
-        <li>A URL in a report ≠ the claim is true</li>
-        <li>Vendor due diligence needs receipts, not vibes</li>
-        <li>Manual verification takes hours per vendor</li>
-      </ul>
-      <div class="notes">
-        Everyone here has clicked a citation that didn't say what the AI claimed.
-        In vendor due diligence that's not annoying — it's a bad procurement decision.
-        Objection prep: "Isn't this just RAG?" → RAG retrieves text; it doesn't verify the claim against it. We gate on proof.
+  <!-- 02 — PROBLEM -->
+  <div class="slide" style="background: var(--paper);">
+    <div class="eyebrow">01 — The problem</div>
+    <div class="col">
+      <h2 class="headline in">AI research tools invent citations.</h2>
+      <div class="in d2" style="margin-top: 56px; max-width: 720px;">
+        <div style="display: flex; gap: 0; border-top: 1px solid var(--ink);">
+          <div style="flex: 1; padding: 20px 32px 20px 0;">
+            <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px;">The claim</p>
+            <p class="small" style="color: var(--ink-soft); font-size: 16px;">"Vendor X suffered a major data breach in March 2024."</p>
+          </div>
+          <div style="flex: 1; padding: 20px 0; border-left: 1px solid var(--hairline); padding-left: 32px;">
+            <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px;">The cited source</p>
+            <p class="small" style="font-size: 16px;"><span class="accent">never mentions a breach.</span> It's a pricing page.</p>
+          </div>
+        </div>
+        <hr class="rule" style="margin-top: 4px;">
       </div>
+      <p class="body in d3" style="margin-top: 44px; font-size: 21px;">
+        A URL next to a claim is not evidence.<br>
+        Procurement decisions need <span class="accent">receipts, not vibes.</span>
+      </p>
     </div>
+    <div class="pagenum">02 / 07</div>
+    <div class="notes"><b>OBJECTION PREP — "isn't this just RAG?"</b> RAG retrieves text and trusts the model's summary of it. We verify the claim's quote literally exists inside the cited source — deterministic, not probabilistic. If judges push: "the hard part isn't the string match — it's forcing the LLM to emit verifiable claims in the first place."</div>
+  </div>
 
-    <!-- 3. SOLUTION -->
-    <div class="slide">
-      <span class="caption animate-in">The Solution</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px; max-width: 900px;">
-        Every claim carries its evidence —<br>or says it can't.
-      </h1>
-      <div class="divider animate-in"></div>
-      <div class="grid-3 animate-in" style="margin-top: 32px;">
-        <div class="card">
-          <p class="caption" style="color: var(--c-accent);">PLANS</p>
-          <p class="h3" style="margin-top: 12px;">Self-directed research</p>
-          <p class="small" style="margin-top: 8px;">The model decomposes the objective into its own queries — not a fixed script.</p>
-        </div>
-        <div class="card-glow">
-          <p class="caption" style="color: var(--c-accent);">VERIFIES</p>
-          <p class="h3" style="margin-top: 12px;">Deterministic validator</p>
-          <p class="small" style="margin-top: 8px;">A citation only counts if its verbatim quote exists inside the cited source. Downgrades only — never upgrades.</p>
-        </div>
-        <div class="card">
-          <p class="caption" style="color: var(--c-accent);">ACTS</p>
-          <p class="h3" style="margin-top: 12px;">Real automation</p>
-          <p class="small" style="margin-top: 8px;">Dedupe, job tracking, risk alerts, failure recovery — running on n8n right now.</p>
-        </div>
+  <!-- 03 — MECHANISM -->
+  <div class="slide">
+    <div class="eyebrow">02 — How it works</div>
+    <div class="col">
+      <h2 class="headline in" style="max-width: 24ch;">The model proposes.<br><em>Deterministic code disposes.</em></h2>
+      <div class="in d2" style="margin-top: 48px;">
+        <table class="ledger" style="max-width: 860px;">
+          <thead>
+            <tr><th style="width: 30%;">Stage</th><th style="width: 44%;">What happens</th><th>Trust</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono" style="font-size: 13px;">PLANNER</td>
+              <td>MiniMax-M3 decomposes the objective into its own queries</td>
+              <td class="mono" style="font-size: 12px; color: var(--muted);">probabilistic</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size: 13px;">COLLECTOR</td>
+              <td>Tavily Search → dedupe → Extract full source text</td>
+              <td class="mono" style="font-size: 12px; color: var(--muted);">deterministic</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size: 13px;">VERIFIER</td>
+              <td>Every claim must quote its source verbatim — or it's downgraded</td>
+              <td class="mono verdict bad" style="font-size: 12px;">never upgrades</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="notes">
-        The middle card is the moat. The LLM proposes; deterministic code disposes.
-        "insufficient_evidence" is a first-class honest result — that honesty is the product.
-      </div>
+      <p class="body in d3" style="margin-top: 40px; max-width: 60ch;">
+        Claims can only move <em>down</em> the ladder — supported → insufficient_evidence → contradicted. <span class="accent">insufficient_evidence is a valid answer.</span>
+      </p>
     </div>
+    <div class="pagenum">03 / 07</div>
+    <div class="notes"><b>KEY LINE</b> "The LLM proposes; deterministic code disposes." This is the moat sentence — slow down on it. The verifier can strip a claim's citation, downgrade it, or flag review. It can never upgrade.</div>
+  </div>
 
-    <!-- 4. ARCHITECTURE (n8n story) -->
-    <div class="slide bg-alt">
-      <span class="caption animate-in">Architecture</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px;">
-        An orchestrator.<br>Three sub-workflows.
-      </h1>
-      <div class="divider animate-in"></div>
-      <div class="animate-in" style="margin-top: 40px;">
-        <div class="flow">
-          <div class="flow-node">Form Trigger</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">Validate + Fingerprint</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">Dedupe Lookup</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node sub">Research Planner</div>
-        </div>
-        <div class="flow" style="margin-top: 16px; padding-left: 120px;">
-          <div class="flow-node sub">Evidence Collector</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node sub">Claim Verifier</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">Follow-up? (max 1 round)</div>
-          <span class="flow-arrow">→</span>
-          <div class="flow-node">Persist + Alert</div>
-        </div>
-        <p class="small text-muted" style="margin-top: 32px;">
-          Nebius MiniMax-M3 plans &amp; verifies · Tavily Search + Extract collects · n8n orchestrates everything · Error workflow logs + alerts
+  <!-- 04 — PROOF: fake vendor (dark, theatrical) -->
+  <div class="slide dark">
+    <div class="eyebrow">03 — The test nobody else ran</div>
+    <div class="col">
+      <h2 class="headline in" style="max-width: 26ch;">We gave it a vendor that <em>doesn't exist.</em></h2>
+      <div class="in d2" style="margin-top: 44px; max-width: 900px;">
+        <table class="ledger">
+          <thead>
+            <tr><th style="width: 26%;">Finding — "Nimbus Quantum Systems GmbH"</th><th style="width: 18%;">Topic</th><th style="width: 26%;">Cited source actually says</th><th>Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono" style="font-size: 13px;">Claim ×12</td>
+              <td>security · breach · funding</td>
+              <td>unrelated "Nimbus" companies</td>
+              <td class="verdict bad">INSUFFICIENT_EVIDENCE</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size: 13px;">Claim +1</td>
+              <td>identity</td>
+              <td>"Nimbus AdTech is a different company"</td>
+              <td class="verdict" style="color: var(--accent);">CONTRADICTED</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="in d3" style="margin-top: 44px; font-family: var(--serif); font-size: clamp(22px, 2.2vw, 30px); line-height: 1.3; max-width: 34ch;">
+        Every other tool would have confidently written the report anyway. <span class="accent">Ours refused.</span>
+      </p>
+    </div>
+    <div class="pagenum" style="color: rgba(242,241,236,0.4);">04 / 07</div>
+    <div class="notes"><b>THE 10-SECOND PEAK</b> This is the whole pitch in one slide. Fake vendor → zero fabrication → honest failure report + review flag. If wifi allows, show it live: submit a nonsense company, watch every claim come back insufficient_evidence. Pause after "Ours refused."</div>
+  </div>
+
+  <!-- 05 — ARCHITECTURE -->
+  <div class="slide" style="background: var(--paper);">
+    <div class="eyebrow">04 — Under the hood</div>
+    <div class="col">
+      <h2 class="headline in" style="max-width: 22ch;">One orchestrator. Three sub-workflows. <em>This is the real canvas.</em></h2>
+      <div class="in d2" style="margin-top: 36px;">
+        <img src="assets/n8n-orchestrator-tight.png" alt="VendorProof orchestrator on the n8n canvas" style="width: 100%; max-width: 1240px; border: 1px solid var(--hairline);">
+        <p class="mono" style="font-size: 11.5px; letter-spacing: 0.1em; color: var(--muted); margin-top: 14px; text-transform: uppercase;">
+          n8n Cloud — live orchestrator · Form → validate → dedupe → 3× Execute Workflow → bounded follow-up → persist → Gmail alert
         </p>
       </div>
-      <div class="notes">
-        For the n8n judges: this is composition, not scripting. Three published sub-workflows called via Execute Workflow;
-        the entire fan-out pipeline runs on native nodes — Set, Split Out, Filter, Remove Duplicates, Aggregate, Crypto.
-        Only two Code nodes exist, where logic IS the product.
+      <div class="in d3" style="margin-top: 40px; display: flex; gap: 0; max-width: 1100px; border-top: 1px solid var(--ink); padding-top: 24px;">
+        <div style="flex: 1; padding-right: 40px;">
+          <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">3 sub-workflows</p>
+          <p class="small" style="font-size: 15px; color: var(--ink-soft);">Planner · Evidence Collector · Claim Verifier — each published, each callable via Execute Workflow, each spawning its own execution trace.</p>
+        </div>
+        <div style="flex: 1; padding-left: 40px; border-left: 1px solid var(--hairline);">
+          <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">Native-node pipeline</p>
+          <p class="small" style="font-size: 15px; color: var(--ink-soft);">Search fan-out runs on Split Out, Filter, Remove Duplicates, Limit, Aggregate. Code nodes exist only where logic <em>is</em> the product.</p>
+        </div>
       </div>
     </div>
+    <div class="pagenum">05 / 07</div>
+    <div class="notes"><b>FOR n8n JUDGES</b> This is composition, not scripting. If asked "why not just a Python script?" — the orchestration, retries, error workflow, dedupe store, and alerts are all declarative n8n. The whole system is inspectable on canvas.</div>
+  </div>
 
-    <!-- 5. DEMO -->
-    <div class="slide">
-      <span class="caption animate-in">Live System</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px;">Running in production. Right now.</h1>
-      <div class="divider animate-in"></div>
-      <div class="grid-2 animate-in" style="margin-top: 32px;">
-        <div class="card">
-          <p class="caption" style="color: var(--c-accent);">SUBMIT</p>
-          <p class="h3" style="margin-top: 12px;">Public form → instant ack</p>
-          <p class="small mono" style="margin-top: 8px;">/form/vp-assessment</p>
-        </div>
-        <div class="card">
-          <p class="caption" style="color: var(--c-accent);">RETRIEVE</p>
-          <p class="h3" style="margin-top: 12px;">Report lookup form</p>
-          <p class="small mono" style="margin-top: 8px;">/form/vp-lookup</p>
-        </div>
-      </div>
-      <ul class="bullet-list animate-in" style="margin-top: 32px; max-width: 800px;">
-        <li>6 real vendor reports already in the table</li>
-        <li>Every failure logged + emailed to operator</li>
-      </ul>
-      <div class="notes">
-        Open the form live if there's wifi. Otherwise: executions show real runs —
-        planner, collector, verifier as separate sub-executions. Show the trace.
-      </div>
-    </div>
-
-    <!-- 6. PROOF -->
-    <div class="slide bg-alt">
-      <span class="caption animate-in">Proof</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px;">Tested against reality —<br>including a fake vendor.</h1>
-      <div class="divider animate-in"></div>
-      <div class="grid-4 animate-in" style="margin-top: 32px;">
-        <div class="metric-card">
-          <div class="metric-value">7</div>
-          <div class="metric-label">E2E vendor assessments</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value">0</div>
-          <div class="metric-label">API calls on duplicate request</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value">2</div>
-          <div class="metric-label">Research rounds fired autonomously</div>
-        </div>
-        <div class="metric-card">
-          <div class="metric-value">100%</div>
-          <div class="metric-label">Fabricated vendor flagged — zero invention</div>
-        </div>
-      </div>
-      <p class="small text-muted animate-in" style="margin-top: 32px;">
-        "Nimbus Quantum Systems GmbH" doesn't exist → every claim came back <em>insufficient_evidence</em>, plus one <em>contradicted</em> for a different company named Nimbus.
-      </p>
-      <div class="notes">
-        The fake-vendor test is the strongest 10 seconds of the pitch. The system didn't hallucinate a report —
-        it reported honestly and flagged review. That's the whole thesis in one test.
-      </div>
-    </div>
-
-    <!-- 7. DIFFERENTIATION -->
-    <div class="slide">
-      <span class="caption animate-in">Why Not Just…</span>
-      <h1 class="h1 animate-in" style="margin-top: 16px;">Everyone demos research.<br>We ship verification.</h1>
-      <div class="divider animate-in"></div>
-      <table class="comparison-table animate-in" style="margin-top: 32px;">
+  <!-- 06 — STACK / load-bearing partner tech -->
+  <div class="slide">
+    <div class="eyebrow">05 — Built on the stack, not beside it</div>
+    <div class="col">
+      <table class="ledger in" style="max-width: 900px; margin-top: 8px;">
         <thead>
-          <tr>
-            <th></th>
-            <th>Research chatbot</th>
-            <th>Search + LLM</th>
-            <th style="color: var(--c-accent);">VendorProof</th>
-          </tr>
+          <tr><th style="width: 26%;">Partner</th><th style="width: 46%;">Load-bearing role</th><th>Remove it and</th></tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Plans its own queries</td>
-            <td class="cross">✗</td>
-            <td class="cross">✗</td>
-            <td class="check">✓</td>
+          <tr class="in d1">
+            <td class="mono" style="font-size: 13px;">NEBIUS</td>
+            <td>MiniMax-M3 plans research + issues verdicts via strict JSON schema</td>
+            <td class="mono" style="font-size: 12px; color: var(--muted);">no reasoning exists</td>
           </tr>
-          <tr>
-            <td>Shows citations</td>
-            <td class="check">✓</td>
-            <td class="check">✓</td>
-            <td class="check">✓</td>
+          <tr class="in d2">
+            <td class="mono" style="font-size: 13px;">TAVILY</td>
+            <td>Search discovers sources; Extract provides the text claims are verified against</td>
+            <td class="mono" style="font-size: 12px; color: var(--muted);">no evidence exists</td>
           </tr>
-          <tr>
-            <td>Proves quote ∈ cited source</td>
-            <td class="cross">✗</td>
-            <td class="cross">✗</td>
-            <td class="check">✓</td>
-          </tr>
-          <tr>
-            <td>Bounded follow-up research</td>
-            <td class="cross">✗</td>
-            <td class="cross">✗</td>
-            <td class="check">✓</td>
-          </tr>
-          <tr class="highlight">
-            <td>Says "I can't verify that"</td>
-            <td class="cross">✗</td>
-            <td class="cross">✗</td>
-            <td class="check">✓</td>
+          <tr class="in d3">
+            <td class="mono" style="font-size: 13px;">n8n</td>
+            <td>Orchestrator, sub-workflows, data tables, error handling, Gmail alerts</td>
+            <td class="mono" style="font-size: 12px; color: var(--muted);">no system exists</td>
           </tr>
         </tbody>
       </table>
-      <div class="notes">
-        Objection prep: "Isn't Perplexity/the cookbook already this?" → They attach URLs.
-        We deterministically verify the quote lives inside that URL's extracted content, and downgrade otherwise. Monotonic: never upgrades.
-      </div>
+      <p class="small in d4" style="margin-top: 36px; font-size: 15px;">
+        Live now: <span class="mono" style="font-size: 13px;">/form/vp-assessment</span> → instant ack · <span class="mono" style="font-size: 13px;">/form/vp-lookup</span> → rendered report · 7 vendors assessed · dedupe replay = 0 API calls · follow-up loop fired organically on a real run
+      </p>
     </div>
-
-    <!-- 8. ASK / CONTACT -->
-    <div class="slide bg-alt" style="justify-content: center; align-items: center; text-align: center;">
-      <span class="caption animate-in">The Ask</span>
-      <h1 class="h2 animate-in" style="margin-top: 24px; max-width: 800px;">
-        Judge it like a jury.<br>Click three citations yourself.
-      </h1>
-      <div class="divider animate-in" style="margin: 32px auto;"></div>
-      <div class="animate-in flex flex-col gap-sm" style="align-items: center;">
-        <p class="body">github.com/<span class="mono">umutyesildal</span>/vendorproof</p>
-        <p class="small text-muted" style="margin-top: 8px;">Built solo today · Nebius + Tavily + n8n</p>
-      </div>
-      <div class="notes">
-        Close on confidence: we ran the honesty test the judges would run.
-        Repo has workflow exports, the validator test suite, and a real report.
-      </div>
-    </div>
-
-    <!-- Navigation -->
-    <div class="nav-bar">
-      <button class="nav-btn" onclick="prev()">← Prev</button>
-      <span class="nav-counter"><span id="current">1</span> / <span id="total"></span></span>
-      <div class="nav-progress"><div class="nav-progress-fill" id="progress"></div></div>
-      <button class="nav-btn" onclick="next()">Next →</button>
-    </div>
+    <div class="pagenum">06 / 07</div>
+    <div class="notes"><b>SCORING</b> Judging criteria: creativity + technical complexity + bonus for partner tech. Every partner is load-bearing — this table answers "did they actually use the stack" in 15 seconds. The last line lists only real, verified numbers.</div>
   </div>
 
-  <script>
-    let current = 0;
-    const slides = document.querySelectorAll('.slide');
-    const total = slides.length;
-    let notesVisible = false;
-    document.getElementById('total').textContent = total;
-    function show(i) {
-      slides.forEach(s => s.classList.remove('active'));
-      current = Math.max(0, Math.min(i, total - 1));
-      slides[current].classList.add('active');
-      document.getElementById('current').textContent = current + 1;
-      document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
-      document.querySelectorAll('.notes').forEach(n => n.classList.remove('visible'));
-      const note = slides[current].querySelector('.notes');
-      if (note && notesVisible) note.classList.add('visible');
+  <!-- 07 — CLOSE -->
+  <div class="slide">
+    <div class="eyebrow">VendorProof</div>
+    <div class="col" style="justify-content: center;">
+      <h2 class="display in" style="max-width: 16ch;">Judge it like a jury. <em>Click three citations yourself.</em></h2>
+      <hr class="rule in d2" style="margin: 48px 0 28px; width: 100%; max-width: 480px;">
+      <p class="mono in d3" style="font-size: 15px; color: var(--ink-soft);">github.com/umutyesildal/vendorproof</p>
+    </div>
+    <div class="footer-left">MINIMAX-M3 · TAVILY · N8N</div>
+    <div class="pagenum">07 / 07</div>
+    <div class="notes"><b>CLOSE — last 20s</b> The repo has the workflow exports, the validator test suite (10/10), and a real report. Invite them to audit the audit. Then stop — silence is confidence.</div>
+  </div>
+
+  <div class="nav">
+    <button onclick="prev()">← PREV</button>
+    <button onclick="next()">NEXT →</button>
+  </div>
+</div>
+
+<script>
+  let cur = 0, notesOn = false;
+  const slides = document.querySelectorAll('.slide');
+  function show(i) {
+    slides.forEach(s => s.classList.remove('active'));
+    cur = Math.max(0, Math.min(i, slides.length - 1));
+    slides[cur].classList.add('active');
+    document.querySelectorAll('.notes').forEach(n => n.classList.remove('visible'));
+    const note = slides[cur].querySelector('.notes');
+    if (note && notesOn) note.classList.add('visible');
+  }
+  const next = () => show(cur + 1), prev = () => show(cur - 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+    if (e.key === 'n' || e.key === 'N') {
+      notesOn = !notesOn;
+      const note = slides[cur].querySelector('.notes');
+      if (note) note.classList.toggle('visible', notesOn);
     }
-    function next() { show(current + 1); }
-    function prev() { show(current - 1); }
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
-      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
-      if (e.key === 'n' || e.key === 'N') {
-        notesVisible = !notesVisible;
-        document.querySelectorAll('.notes').forEach(n => {
-          n.classList.toggle('visible', notesVisible && n.closest('.slide').classList.contains('active'));
-        });
-      }
-    });
-    document.getElementById('deck').addEventListener('click', (e) => {
-      if (e.target.closest('.nav-bar') || e.target.closest('.nav-btn')) return;
-      if (e.clientX > window.innerWidth / 2) next(); else prev();
-    });
-    show(0);
-  </script>
+  });
+  document.getElementById('deck').addEventListener('click', e => {
+    if (e.target.closest('.nav')) return;
+    e.clientX > window.innerWidth / 2 ? next() : prev();
+  });
+  show(0);
+</script>
 </body>
 </html>
