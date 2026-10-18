@@ -221,13 +221,34 @@
         <img src="assets/vp-report-crop.png" alt="VendorProof report for Nimbus Quantum Systems GmbH — every finding insufficient_evidence or contradicted" style="width: 100%; border: 1px solid rgba(242,241,236,0.18);">
       </div>
     </div>
-    <div class="pagenum" style="color: rgba(242,241,236,0.4);">04 / 07</div>
+    <div class="pagenum" style="color: rgba(242,241,236,0.4);">04 / 08</div>
     <div class="notes"><b>THE 10-SECOND PEAK</b> This is the whole pitch in one slide. Fake vendor → zero fabrication → honest failure report + review flag. If wifi allows, show it live: submit a nonsense company, watch every claim come back insufficient_evidence. Pause after "Ours refused."</div>
   </div>
 
-  <!-- 05 — ARCHITECTURE -->
+  <!-- 05 — PROOF: the sponsor, audited -->
   <div class="slide" style="background: var(--paper);">
-    <div class="eyebrow">04 — Under the hood</div>
+    <div class="eyebrow">04 — Then we ran the sponsor</div>
+    <div class="col" style="flex-direction: row; align-items: center; gap: 56px;">
+      <div style="flex: 1; min-width: 0;">
+        <h2 class="headline in" style="max-width: 20ch;">Same standard for <em>NVIDIA.</em></h2>
+        <p class="in d3" style="margin-top: 40px; font-family: var(--serif); font-size: clamp(19px, 1.75vw, 25px); line-height: 1.4; max-width: 30ch;">
+          8 claims verified verbatim. 4 honestly downgraded — including one sourced to a YouTube video the extractor couldn't read. <span class="accent">The validator caught it, not us.</span>
+        </p>
+        <p class="mono in d4" style="margin-top: 36px; font-size: 12px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase;">
+          Live report · 2 research rounds · operator alerted
+        </p>
+      </div>
+      <div class="in d2" style="flex: 1.3; min-width: 0;">
+        <img src="assets/vp-report-nvidia.png" alt="VendorProof live report for NVIDIA — 8 supported, 4 insufficient evidence, review required" style="width: 100%; border: 1px solid var(--hairline);">
+      </div>
+    </div>
+    <div class="pagenum">05 / 08</div>
+    <div class="notes"><b>THE AUDACIOUS SLIDE</b> "We pointed it at NVIDIA." Judges are NVIDIA/Nebius — this is instantly legible. The killer detail: a claim citing a YouTube video the extractor couldn't parse got auto-downgraded to insufficient_evidence. That's the validator working, not a canned demo. 8/12 supported = honest mix, not a greenwashed report.</div>
+  </div>
+
+  <!-- 06 — ARCHITECTURE -->
+  <div class="slide" style="background: var(--paper);">
+    <div class="eyebrow">05 — Under the hood</div>
     <div class="col">
       <h2 class="headline in" style="max-width: 22ch;">One orchestrator. Three sub-workflows. <em>This is the real canvas.</em></h2>
       <div class="in d2" style="margin-top: 32px;">
@@ -242,13 +263,13 @@
         </p>
       </div>
     </div>
-    <div class="pagenum">05 / 07</div>
+    <div class="pagenum">06 / 08</div>
     <div class="notes"><b>FOR n8n JUDGES</b> This is composition, not scripting. If asked "why not just a Python script?" — the orchestration, retries, error workflow, dedupe store, and alerts are all declarative n8n. The whole system is inspectable on canvas.</div>
   </div>
 
   <!-- 06 — STACK / load-bearing partner tech -->
   <div class="slide">
-    <div class="eyebrow">05 — Built on the stack, not beside it</div>
+    <div class="eyebrow">06 — Built on the stack, not beside it</div>
     <div class="col">
       <table class="ledger in" style="max-width: 900px; margin-top: 8px;">
         <thead>
@@ -273,10 +294,10 @@
         </tbody>
       </table>
       <p class="small in d4" style="margin-top: 36px; font-size: 15px;">
-        Live now: <span class="mono" style="font-size: 13px;">/form/vp-assessment</span> → instant ack · <span class="mono" style="font-size: 13px;">/form/vp-lookup</span> → rendered report · 7 vendors assessed · dedupe replay = 0 API calls · follow-up loop fired organically on a real run
+        Live now: <span class="mono" style="font-size: 13px;">/form/vp-assessment</span> → instant ack · <span class="mono" style="font-size: 13px;">/form/vp-lookup</span> → rendered report · 8 vendors assessed · dedupe replay = 0 API calls · follow-up loop fired organically on a real run
       </p>
     </div>
-    <div class="pagenum">06 / 07</div>
+    <div class="pagenum">07 / 08</div>
     <div class="notes"><b>SCORING</b> Judging criteria: creativity + technical complexity + bonus for partner tech. Every partner is load-bearing — this table answers "did they actually use the stack" in 15 seconds. The last line lists only real, verified numbers.</div>
   </div>
 
@@ -289,7 +310,7 @@
       <p class="mono in d3" style="font-size: 15px; color: var(--ink-soft);">github.com/umutyesildal/vendorproof</p>
     </div>
     <div class="footer-left">MINIMAX-M3 · TAVILY · N8N</div>
-    <div class="pagenum">07 / 07</div>
+    <div class="pagenum">08 / 08</div>
     <div class="notes"><b>CLOSE — last 20s</b> The repo has the workflow exports, the validator test suite (10/10), and a real report. Invite them to audit the audit. Then stop — silence is confidence.</div>
   </div>
 
