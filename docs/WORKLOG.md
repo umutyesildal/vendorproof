@@ -204,6 +204,21 @@ Code nodes total: 14 → **3** (validator, retrieval HTML render, error normaliz
 5. **Crypto node does NOT pass input fields through** — output contains only the hash. Company/objective became null downstream and a `company:null` `status:completed` row got persisted, which then poisoned dedupe cache. Fixed by re-deriving fields in the following Set node + upserting the polluted row to `status:stale` via `POST /data-tables/{id}/rows/upsert` (public API rows are insert/upsert only — no delete).
 6. Verified live (exec 27): orchestrator → 3 sub-workflow executions → correct Scale AI report, `requires_review` via severity. Sub-workflow error propagation to error handler also verified (exec 20→21).
 
+### Iteration round 4 — load test + agentic loop proven
+
+Four parallel submissions (exec 31/33/35/37), all success:
+
+| Vendor | Result |
+|---|---|
+| OpenAI | 12/12 supported, review (severity) |
+| Vultr | 9 supported + 3 insufficient_evidence (degraded) |
+| Weights & Biases | 8 supported + 4 insufficient_evidence (degraded) |
+| Nimbus Quantum Systems GmbH (fabricated) | All `insufficient_evidence` + one `contradicted` ("Nimbus AdTech is a different company") — honest failure report, **zero fabrication** |
+
+**Bug found by the fabricated-vendor test:** zero findings produced `requires_review:false` — fixed: `no_verifiable_findings` review reason + follow-up gate loosened to honor `needs_more_research` directly.
+
+**Exec 51 (Taalas): follow-up loop fired organically** — 3 model calls, 2 research rounds, 12/12 supported after R2. Agentic self-directed re-research verified live.
+
 ### Remaining blockers (user)
 
 - **Gmail OAuth credential** must be created in n8n UI (browser flow), then enable the 2 disabled Gmail nodes + set operator email.

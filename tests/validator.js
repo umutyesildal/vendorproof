@@ -41,6 +41,7 @@ if (normalizedOnly) reasons.push('normalized_match_audit');
 if (downgraded>=2) reasons.push('downgrade_threshold');
 if (materialInsuff >= Math.ceil(findings.filter(f=>MATERIAL.has(f.topic)).length/2) && findings.some(f=>MATERIAL.has(f.topic))) reasons.push('material_insufficiency');
 if (findings.some(f=>f.compound)) reasons.push('compound_claim_suspected');
-const needsFollowUp = Boolean(rep.needs_more_research && retrievable.length && rep.follow_up_queries?.length && ctx.round !== 1);
+if (!findings.length || findings.every(f=>f.verification==='insufficient_evidence')) reasons.push('no_verifiable_findings');
+const needsFollowUp = Boolean(rep.needs_more_research && rep.follow_up_queries?.length && ctx.round !== 1);
 const followUps = (rep.follow_up_queries || []).slice(0,3).map(q => ({ ...q, company: ctx.company, objective: ctx.objective, dedupe_key: ctx.dedupe_key, round: 1 }));
 return [{ json: { findings, assessment: rep.assessment, needs_follow_up: needsFollowUp, follow_up_queries: needsFollowUp ? followUps : [], review_reasons: reasons, downgraded, round: ctx.round || 0, sources: srcs, failed_results: ctx.failed_results || [], searched_queries: ctx.searched_queries || [] } }];
