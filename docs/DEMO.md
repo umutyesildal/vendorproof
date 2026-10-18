@@ -1,60 +1,21 @@
-# VendorProof — 2 dakikalık demo videosu (Stage 1 başvurusu)
+# VendorProof — 2-minute pitch (deck only)
 
-Hedef: n8n side track'ini kazanmak. 120 saniyenin ~45'inde ekranda n8n canvas'ı ve execution'lar olacak; anlatılan her şey ekranda gösterilecek, sadece söylenmeyecek.
+No live demo. Present `pitch-deck.html` full screen (arrow keys / space to advance, `N` toggles speaker notes). ~15 seconds per slide.
 
-Jüri uluslararası olduğu için seslendirme İngilizce. Her bölümde okunacak İngilizce metin ve Türkçe anlamı var.
+| Time | Slide | Voiceover |
+|---|---|---|
+| 0:00–0:08 | 1 — Cover | "This is VendorProof. It researches a vendor for you — and proves every claim before you see it." |
+| 0:08–0:23 | 2 — The problem | "AI research tools invent citations. They put a URL next to a claim, but nobody checks that the page actually says it. For a procurement decision, a link is not evidence." |
+| 0:23–0:43 | 3 — How it works | "So we split the job. NVIDIA Nemotron plans the research, Tavily finds and extracts the sources, and the model drafts each claim with a verbatim quote. Then deterministic code checks that the URL was really extracted, the quote is really on that page, and the page names the vendor. It can only downgrade a claim — never upgrade one." |
+| 0:43–1:00 | 4 — Fake vendor | "First test: a vendor that doesn't exist. Search came back with look-alike companies. Most tools would have written the report anyway. VendorProof refused — zero supported claims, cannot assess." |
+| 1:00–1:15 | 5 — NVIDIA | "Then we ran the sponsor. Four NVIDIA claims verified word for word — supply chain, lock-in, compliance. Five were dropped because the quote didn't check out. The validator caught them, not us." |
+| 1:15–1:32 | 6 — Under the hood | "It's all built in n8n: one orchestrator and three sub-workflows — planner, collector, verifier. Fifty nodes, only four of them Code; caching, the follow-up round, error handling and Gmail alerts are native n8n." |
+| 1:32–1:47 | 7 — Stack | "Every partner is load-bearing. Nebius serves the model, Tavily supplies the evidence, n8n runs the system. Remove any one and the product stops existing." |
+| 1:47–2:00 | 8 — Close | "Judge it like a jury — click three citations yourself. The repo is public. VendorProof: research once, verify every claim." |
 
-## Kayıttan önce hazırlık
+## Submission checklist (Tech Europe dashboard)
 
-1. NVIDIA (execution #82) ve Nimbus (execution #84) raporları zaten kayıtlı, lookup formu anında açar.
-2. Chrome sekmelerini bu sırayla aç, hepsinde giriş yapılmış olsun, yazılar 1080p'de okunacak kadar zoom'lu olsun:
-   1. `https://yesildal.app.n8n.cloud/form/vp-lookup` → Nimbus raporu açık
-   2. `https://yesildal.app.n8n.cloud/form/vp-assessment` (boş form)
-   3. n8n orchestrator canvas'ı (zoom-to-fit)
-   4. n8n Executions → NVIDIA execution'ı #82 (yeşil), zoom-to-fit
-   5. `https://yesildal.app.n8n.cloud/form/vp-lookup` → NVIDIA raporu açık
-   6. NVIDIA'nın SUPPORTED bulgularından birinin kaynak sayfası (alıntının altındaki link)
-3. Bildirimleri kapat (Rahatsız Etme), yer imleri çubuğunu gizle (Cmd+Shift+B), n8n'deki checklist popup'ını kapat.
-4. QuickTime veya Cmd+Shift+5 ile tam ekran, mikrofon açık kaydet. Her bölüm ayrı çekilebilir, sonra herhangi bir editörde birleştir.
-
-## Çekim listesi ve seslendirme
-
-**0:00–0:12 · Sekme 1: Nimbus raporu, "CANNOT ASSESS — NO SUPPORTED EVIDENCE"**
-- Söyle: "We asked an AI to research a vendor that doesn't exist. Most tools would write the report anyway. VendorProof refused — no quote, no claim."
-- Anlamı: Var olmayan bir şirketi araştırttık. Çoğu araç yine de rapor yazardı. VendorProof reddetti: alıntı yoksa iddia da yok.
-
-**0:12–0:25 · Sekme 2: `NVIDIA` ve amacı yaz, "Start assessment"a bas, anında onay gelir**
-- Söyle: "VendorProof is evidence-first vendor due diligence. You name a company and what you need to know. The research runs in the background."
-- Anlamı: VendorProof kanıt odaklı tedarikçi araştırması yapar. Şirketi ve ne öğrenmek istediğini yazarsın, araştırma arka planda çalışır.
-
-**0:25–0:50 · Sekme 3: orchestrator canvas'ı, soldan sağa gez**
-- Söyle: "It is built entirely as n8n workflows. One orchestrator: intake and a dedupe cache, then three sub-workflows — plan, collect, verify — a bounded follow-up round, and persistence with Gmail alerts. The whole research pipeline is native nodes except one: the Code node that validates the evidence."
-- Anlamı: Tamamen n8n workflow'larıyla kurulu. Bir orchestrator var: girdi kontrolü ve tekrar önleyen cache, ardından üç sub-workflow (planla, topla, doğrula), en fazla bir ek araştırma turu, kayıt ve Gmail uyarısı. Araştırma hattında kanıtı doğrulayan tek bir Code node dışında her şey native node.
-
-**0:50–1:05 · Sekme 4: yeşil execution, Evidence Collector sub-execution'ını aç**
-- Söyle: "NVIDIA Nemotron on Nebius Token Factory writes the research plan. Tavily searches and extracts the sources — every query gets an equal share of URLs, all with Split Out, Filter, Remove Duplicates, Limit and Aggregate."
-- Anlamı: Araştırma planını Nebius Token Factory'deki NVIDIA Nemotron yazar. Kaynakları Tavily arar ve metinlerini çeker. Her sorgu eşit sayıda URL alır, hepsi Split Out, Filter, Remove Duplicates, Limit ve Aggregate node'larıyla.
-
-**1:05–1:35 · Sekme 5: NVIDIA raporu, risk satırı, bir SUPPORTED bulgu ve alıntısı → Sekme 6, kaynak sayfada Cmd+F ile alıntıyı bul**
-- Söyle: "The model must quote its source for every claim. Then deterministic code — not another model — checks that the quote really exists in that exact page. Here is the claim, here is the quote, and here it is on the source. Four claims verified for NVIDIA; five were dropped automatically because the quote didn't check out."
-- Anlamı: Model her iddia için kaynağından alıntı yapmak zorunda. Sonra başka bir model değil, deterministik kod o alıntının gerçekten o sayfada olup olmadığını kontrol eder. İşte iddia, işte alıntı, işte kaynakta. NVIDIA için 4 iddia doğrulandı, alıntısı tutmayan 5 iddia otomatik olarak düşürüldü.
-
-**1:35–1:50 · Sekme 5: bir INSUFFICIENT EVIDENCE bulgusuna, sonra review banner'ına in**
-- Söyle: "A claim the validator can't prove drops to insufficient evidence — nothing is ever upgraded. When evidence is missing, the report says so and flags a human for review."
-- Anlamı: Doğrulayıcının kanıtlayamadığı iddia "yetersiz kanıt"a düşer, hiçbir iddia yükseltilmez. Kanıt eksikse rapor bunu açıkça söyler ve bir insanı incelemeye çağırır.
-
-**1:50–2:00 · Sekme 3 ya da deck'in son slaytı**
-- Söyle: "Research once. Verify every claim. Monitor what changes. VendorProof — built on n8n, NVIDIA Nemotron, Nebius and Tavily."
-- Anlamı: Bir kez araştır. Her iddiayı doğrula. Değişeni takip et. VendorProof: n8n, NVIDIA Nemotron, Nebius ve Tavily üzerinde.
-
-## Yedek planlar
-
-- Form gönderimi yavaş kalırsa onay ekranından direkt mevcut yeşil execution'a (Sekme 4) kes. Kamerada asla bekleme.
-- İnternet giderse `pitch-deck.html`'deki Nimbus ve NVIDIA rapor kartlarıyla mimari slaytı üzerinden anlat (slayt 4–6).
-
-## Başvuru kontrol listesi (Tech Europe dashboard)
-
-- [ ] 2 dakikalık video yüklendi
-- [ ] Public repo: https://github.com/umutyesildal/vendorproof (README: kurulum, API'ler, framework'ler, partner teknolojileri, mimari)
-- [ ] Partner teknolojileri listelendi: n8n, NVIDIA Nemotron, Nebius Token Factory, Tavily
-- [ ] 18:30'dan önce gönderildi (gönderimi sadece sen yaparsın)
+- [ ] 2-minute video uploaded
+- [ ] Public repo: https://github.com/umutyesildal/vendorproof
+- [ ] Partner technologies listed: n8n, NVIDIA Nemotron, Nebius Token Factory, Tavily
+- [ ] Submitted before 18:30
