@@ -207,32 +207,19 @@
   <!-- 04 — PROOF: fake vendor (dark, theatrical) -->
   <div class="slide dark">
     <div class="eyebrow">03 — The test nobody else ran</div>
-    <div class="col">
-      <h2 class="headline in" style="max-width: 26ch;">We gave it a vendor that <em>doesn't exist.</em></h2>
-      <div class="in d2" style="margin-top: 44px; max-width: 900px;">
-        <table class="ledger">
-          <thead>
-            <tr><th style="width: 26%;">Finding — "Nimbus Quantum Systems GmbH"</th><th style="width: 18%;">Topic</th><th style="width: 26%;">Cited source actually says</th><th>Verdict</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="mono" style="font-size: 13px;">Claim ×12</td>
-              <td>security · breach · funding</td>
-              <td>unrelated "Nimbus" companies</td>
-              <td class="verdict bad">INSUFFICIENT_EVIDENCE</td>
-            </tr>
-            <tr>
-              <td class="mono" style="font-size: 13px;">Claim +1</td>
-              <td>identity</td>
-              <td>"Nimbus AdTech is a different company"</td>
-              <td class="verdict" style="color: var(--accent);">CONTRADICTED</td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="col" style="flex-direction: row; align-items: center; gap: 64px;">
+      <div style="flex: 1; min-width: 0;">
+        <h2 class="headline in" style="max-width: 22ch;">We gave it a vendor that <em>doesn't exist.</em></h2>
+        <p class="in d3" style="margin-top: 44px; font-family: var(--serif); font-size: clamp(22px, 2.1vw, 30px); line-height: 1.35; max-width: 26ch;">
+          Every other tool would have confidently written the report anyway. <span class="accent">Ours refused.</span>
+        </p>
+        <p class="mono in d4" style="margin-top: 40px; font-size: 12px; letter-spacing: 0.14em; color: rgba(242,241,236,0.5); text-transform: uppercase;">
+          Actual report — rendered by the live system
+        </p>
       </div>
-      <p class="in d3" style="margin-top: 44px; font-family: var(--serif); font-size: clamp(22px, 2.2vw, 30px); line-height: 1.3; max-width: 34ch;">
-        Every other tool would have confidently written the report anyway. <span class="accent">Ours refused.</span>
-      </p>
+      <div class="in d2" style="flex: 1.15; min-width: 0;">
+        <img src="assets/vp-report-crop.png" alt="VendorProof report for Nimbus Quantum Systems GmbH — every finding insufficient_evidence or contradicted" style="width: 100%; border: 1px solid rgba(242,241,236,0.18);">
+      </div>
     </div>
     <div class="pagenum" style="color: rgba(242,241,236,0.4);">04 / 07</div>
     <div class="notes"><b>THE 10-SECOND PEAK</b> This is the whole pitch in one slide. Fake vendor → zero fabrication → honest failure report + review flag. If wifi allows, show it live: submit a nonsense company, watch every claim come back insufficient_evidence. Pause after "Ours refused."</div>
@@ -243,21 +230,16 @@
     <div class="eyebrow">04 — Under the hood</div>
     <div class="col">
       <h2 class="headline in" style="max-width: 22ch;">One orchestrator. Three sub-workflows. <em>This is the real canvas.</em></h2>
-      <div class="in d2" style="margin-top: 36px;">
-        <img src="assets/n8n-orchestrator-tight.png" alt="VendorProof orchestrator on the n8n canvas" style="width: 100%; max-width: 1240px; border: 1px solid var(--hairline);">
-        <p class="mono" style="font-size: 11.5px; letter-spacing: 0.1em; color: var(--muted); margin-top: 14px; text-transform: uppercase;">
-          n8n Cloud — live orchestrator · Form → validate → dedupe → 3× Execute Workflow → bounded follow-up → persist → Gmail alert
-        </p>
+      <div class="in d2" style="margin-top: 32px;">
+        <p class="mono" style="font-size: 10.5px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">Orchestrator — live canvas</p>
+        <img src="assets/n8n-orchestrator-tight.png" alt="VendorProof orchestrator on the n8n canvas" style="width: 100%; max-width: 1180px; border: 1px solid var(--hairline);">
       </div>
-      <div class="in d3" style="margin-top: 40px; display: flex; gap: 0; max-width: 1100px; border-top: 1px solid var(--ink); padding-top: 24px;">
-        <div style="flex: 1; padding-right: 40px;">
-          <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">3 sub-workflows</p>
-          <p class="small" style="font-size: 15px; color: var(--ink-soft);">Planner · Evidence Collector · Claim Verifier — each published, each callable via Execute Workflow, each spawning its own execution trace.</p>
-        </div>
-        <div style="flex: 1; padding-left: 40px; border-left: 1px solid var(--hairline);">
-          <p class="mono" style="font-size: 11px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">Native-node pipeline</p>
-          <p class="small" style="font-size: 15px; color: var(--ink-soft);">Search fan-out runs on Split Out, Filter, Remove Duplicates, Limit, Aggregate. Code nodes exist only where logic <em>is</em> the product.</p>
-        </div>
+      <div class="in d3" style="margin-top: 30px;">
+        <p class="mono" style="font-size: 10.5px; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">Sub-workflow: evidence collector — zero code nodes</p>
+        <img src="assets/n8n-collector-tight.png" alt="Evidence collector sub-workflow: Tavily Search, Split, Filter, Dedupe, Limit, Aggregate, Extract" style="width: 100%; max-width: 1180px; border: 1px solid var(--hairline);">
+        <p class="small" style="margin-top: 18px; font-size: 14px; max-width: 100ch;">
+          Three published sub-workflows called via Execute Workflow — Planner, Collector, Verifier. Split Out, Filter, Remove Duplicates, Limit, Aggregate carry the fan-out; code exists only where logic <em>is</em> the product.
+        </p>
       </div>
     </div>
     <div class="pagenum">05 / 07</div>
