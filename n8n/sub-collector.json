@@ -1,0 +1,340 @@
+{
+  "name": "VendorProof — Sub: Evidence Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "e1-trigger",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ query: $json.query, search_depth: 'basic', max_results: 5, include_answer: false, include_usage: true }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "e2-search",
+      "name": "Tavily Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -580,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "rXTgwF8fdkiVBpCJ",
+          "name": "vendorproof-tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "id": "e3-split",
+      "name": "Split Results",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "regex",
+                "value": "^https?://"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "e4-filter",
+      "name": "HTTP URLs Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicateInputItems",
+        "options": {
+          "fieldsToCompare": {
+            "fields": [
+              {
+                "fieldName": "url"
+              }
+            ]
+          },
+          "disableDotNotation": false
+        }
+      },
+      "id": "e5-dedupe",
+      "name": "Dedupe URLs",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        40,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "id": "e6-limit",
+      "name": "Max 10 URLs",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateIndividualFields",
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "url",
+              "renameField": true,
+              "outputFieldName": "urls"
+            },
+            {
+              "fieldToAggregate": "title",
+              "renameField": true,
+              "outputFieldName": "titles"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e7-agg",
+      "name": "Aggregate URLs",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/extract",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ urls: $json.urls, query: $('When Executed by Another Workflow').first().json.objective, chunks_per_source: 3, extract_depth: 'basic', format: 'markdown', timeout: 20, include_usage: true }) }}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "e8-extract",
+      "name": "Tavily Extract",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "rXTgwF8fdkiVBpCJ",
+          "name": "vendorproof-tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "sources",
+              "value": "={{ ($json.results || []).filter(x => x.url && x.raw_content).map(x => ({ url: x.url, title: x.title || '', content: String(x.raw_content).slice(0, 8000) })) }}",
+              "type": "array"
+            },
+            {
+              "id": "r2",
+              "name": "failed_results",
+              "value": "={{ ($json.failed_results || []).map(f => ({ url: f.url, error: String(f.error || 'extract failed').slice(0, 300) })) }}",
+              "type": "array"
+            },
+            {
+              "id": "r3",
+              "name": "searched_queries",
+              "value": "={{ $('When Executed by Another Workflow').all().map(i => i.json.query) }}",
+              "type": "array"
+            },
+            {
+              "id": "r4",
+              "name": "company",
+              "value": "={{ $('When Executed by Another Workflow').first().json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "r5",
+              "name": "objective",
+              "value": "={{ $('When Executed by Another Workflow').first().json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "r6",
+              "name": "dedupe_key",
+              "value": "={{ $('When Executed by Another Workflow').first().json.dedupe_key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "include": "none"
+        }
+      },
+      "id": "e9-shape",
+      "name": "Shape Evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Tavily Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Search": {
+      "main": [
+        [
+          {
+            "node": "Split Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Results": {
+      "main": [
+        [
+          {
+            "node": "HTTP URLs Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP URLs Only": {
+      "main": [
+        [
+          {
+            "node": "Dedupe URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedupe URLs": {
+      "main": [
+        [
+          {
+            "node": "Max 10 URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max 10 URLs": {
+      "main": [
+        [
+          {
+            "node": "Aggregate URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate URLs": {
+      "main": [
+        [
+          {
+            "node": "Tavily Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Extract": {
+      "main": [
+        [
+          {
+            "node": "Shape Evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

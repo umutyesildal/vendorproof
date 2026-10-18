@@ -1,0 +1,239 @@
+{
+  "name": "VendorProof — Sub: Research Planner",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "s1-trigger",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tokenfactory.nebius.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ model: 'MiniMaxAI/MiniMax-M3', temperature: 0.1, max_completion_tokens: 8192, response_format: { type: 'json_schema', json_schema: { name: 'research_plan', strict: true, schema: { type: 'object', properties: { queries: { type: 'array', minItems: 3, maxItems: 4, items: { type: 'object', properties: { query: { type: 'string' }, topic: { type: 'string' }, reason: { type: 'string' } }, required: ['query','topic','reason'], additionalProperties: false } } }, required: ['queries'], additionalProperties: false } } }, messages: [{ role: 'system', content: 'You are the research planner for VendorProof. Decompose the vendor due-diligence objective into 3-4 focused web searches. Prefer official company pricing, security, compliance, docs and status pages first, then reputable independent sources. Each query must target extractable pages.' }, { role: 'user', content: 'Company: ' + $json.company + '\\nObjective: ' + $json.objective }] }) }}",
+        "options": {
+          "timeout": 90000
+        }
+      },
+      "id": "s2-nebius",
+      "name": "Nebius Planner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -380,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "myiguujEgpIHCaZo",
+          "name": "vendorproof-nebius"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "queries",
+              "value": "={{ JSON.parse($json.choices[0].message.content).queries }}",
+              "type": "array"
+            },
+            {
+              "id": "p2",
+              "name": "company",
+              "value": "={{ $('When Executed by Another Workflow').first().json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "p3",
+              "name": "objective",
+              "value": "={{ $('When Executed by Another Workflow').first().json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "p4",
+              "name": "dedupe_key",
+              "value": "={{ $('When Executed by Another Workflow').first().json.dedupe_key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "s3-parse",
+      "name": "Parse Plan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "queries",
+        "options": {}
+      },
+      "id": "s4-split",
+      "name": "Split Queries",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        60,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 4
+      },
+      "id": "s5-limit",
+      "name": "Max 4 Queries",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "q1",
+              "name": "query",
+              "value": "={{ $json.query }}",
+              "type": "string"
+            },
+            {
+              "id": "q2",
+              "name": "topic",
+              "value": "={{ $json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "q3",
+              "name": "reason",
+              "value": "={{ $json.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "q4",
+              "name": "company",
+              "value": "={{ $('Parse Plan').first().json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "q5",
+              "name": "objective",
+              "value": "={{ $('Parse Plan').first().json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "q6",
+              "name": "dedupe_key",
+              "value": "={{ $('Parse Plan').first().json.dedupe_key }}",
+              "type": "string"
+            },
+            {
+              "id": "q7",
+              "name": "round",
+              "value": "0",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "s6-shape",
+      "name": "Shape Query Items",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Nebius Planner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nebius Planner": {
+      "main": [
+        [
+          {
+            "node": "Parse Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Plan": {
+      "main": [
+        [
+          {
+            "node": "Split Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Queries": {
+      "main": [
+        [
+          {
+            "node": "Max 4 Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Max 4 Queries": {
+      "main": [
+        [
+          {
+            "node": "Shape Query Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

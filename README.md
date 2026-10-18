@@ -4,13 +4,16 @@ AI-powered vendor due diligence — **research once, verify every claim, monitor
 
 Built for Nebius Build Week × NVIDIA Berlin (Tavily deep-research track + n8n award), fully n8n-Cloud native: Nebius Token Factory (`MiniMaxAI/MiniMax-M3`) plans and verifies research, Tavily Search + Extract supply live evidence, and a deterministic validator proves every citation before a report ships.
 
-## Live system
+## Live system (orchestrator + sub-workflows)
 
 | Workflow | Purpose |
 |---|---|
-| Vendor Assessment | n8n Form → normalize/fingerprint → dedupe → Nebius planner → Tavily Search → Tavily Extract → Nebius verifier → deterministic R0–R8 validator → bounded follow-up round → persist → operator alert |
-| Report Retrieval | Same company + objective → deterministic fingerprint → Data Table lookup → rendered HTML report |
-| Error Handler | Error Trigger → failure logged to `workflow_failures` table → operator alert |
+| **Orchestrator** | Form → Set → IF → Stop and Error → Crypto fingerprint → dedupe → `Execute Workflow` calls → bounded follow-up round → persist → operator alert. Zero Code nodes. |
+| **Sub: Research Planner** | Nebius `json_schema` plan → native Set/Split Out/Limit fan-out. Zero Code nodes. |
+| **Sub: Evidence Collector** | Tavily Search per query → Split Out → Filter → Remove Duplicates → Limit → Aggregate → Tavily Extract. Zero Code nodes. |
+| **Sub: Claim Verifier** | Nebius verifier → deterministic R0–R8 evidence validator (the one Code node that matters). |
+| **Report Retrieval** | Same company + objective → fingerprint → Data Table lookup → rendered HTML report. |
+| **Error Handler** | Error Trigger → failure logged to `workflow_failures` table → operator Gmail alert. |
 
 Form endpoints (production): `/form/vp-assessment`, `/form/vp-lookup` on the n8n Cloud instance.
 
@@ -31,9 +34,13 @@ Form endpoints (production): `/form/vp-assessment`, `/form/vp-lookup` on the n8n
 
 ```
 n8n/                      workflow exports (secret-free)
-  vendor-assessment.json
-  report-retrieval.json
-  error-handler.json
+  orchestrator.json           main pipeline — zero Code nodes
+  sub-planner.json            Nebius research planning — zero Code nodes
+  sub-collector.json          Tavily search/extract fan-out — zero Code nodes
+  sub-verifier.json           claim verification + deterministic validator
+  report-retrieval.json       report lookup form
+  error-handler.json          published error workflow
+  vendor-assessment-v1-archived.json  earlier monolith, kept for reference
 examples/sample-report.json   real report from a live run
 tests/test-validator.js       validator fixture suite (node tests/test-validator.js)
 docs/                       Markdown source of truth (see docs/INDEX.md)

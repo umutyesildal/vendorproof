@@ -8,7 +8,7 @@ const SRC_B = { url: 'https://blog.example.com/review', title: 'Review', content
 function run(modelReport, sources = [SRC_A, SRC_B]) {
   let result;
   const $input = { first: () => ({ json: { choices: [{ message: { content: JSON.stringify(modelReport) } }] } }) };
-  const $ = (name) => ({ first: () => ({ json: { sources } }) });
+  const $ = (name) => ({ first: () => ({ json: { sources, failed_results: [], company:'T', objective:'O' } }) });
   const fn = new Function('$input', '$', 'require', code);
   try { result = fn($input, $, require); } catch (e) { return { error: e.message }; }
   return result[0].json;

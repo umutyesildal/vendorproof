@@ -1,0 +1,1024 @@
+{
+  "name": "VendorProof — Orchestrator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "VendorProof — New vendor assessment",
+        "formDescription": "Evidence-first vendor due diligence. Enter a company and research objective. Your assessment runs in the background; retrieve it with the same inputs at the report lookup form.",
+        "responseMode": "onReceived",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Company",
+              "fieldName": "company",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Research objective",
+              "fieldName": "objective",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Start assessment",
+          "formSubmittedText": "Assessment started. It runs in the background — retrieve the report at the VendorProof report lookup form using the same company and objective."
+        }
+      },
+      "id": "o01-form",
+      "name": "Assessment Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -1800,
+        300
+      ],
+      "webhookId": "vp-assessment"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "n1",
+              "name": "company",
+              "value": "={{ String($json['Company'] || $json.company || '').trim().replace(/\\s+/g, ' ') }}",
+              "type": "string"
+            },
+            {
+              "id": "n2",
+              "name": "objective",
+              "value": "={{ String($json['Research objective'] || $json.objective || '').trim().replace(/\\s+/g, ' ') }}",
+              "type": "string"
+            },
+            {
+              "id": "n3",
+              "name": "report_version",
+              "value": "v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "include": "none"
+        }
+      },
+      "id": "o02-normalize",
+      "name": "Normalize Input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1580,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.company.length >= 2 && $json.company.length <= 200 && $json.objective.length >= 20 && $json.objective.length <= 2000 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "o03-valid",
+      "name": "Inputs Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1360,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "errorType": "errorMessage",
+        "errorMessage": "Invalid input: company must be 2-200 chars, objective 20-2000 chars."
+      },
+      "id": "o04-reject",
+      "name": "Reject Input",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "hash",
+        "type": "SHA256",
+        "value": "={{ $json.company.toLowerCase() + '|' + $json.objective.toLowerCase() + '|v1' }}",
+        "dataPropertyName": "dedupe_full"
+      },
+      "id": "o05-crypto",
+      "name": "Fingerprint",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0a",
+              "name": "company",
+              "value": "={{ $('Normalize Input').first().json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "d0b",
+              "name": "objective",
+              "value": "={{ $('Normalize Input').first().json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c",
+              "name": "report_version",
+              "value": "v1",
+              "type": "string"
+            },
+            {
+              "id": "d1",
+              "name": "dedupe_key",
+              "value": "={{ $json.dedupe_full.slice(0, 32) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "include": "all"
+        }
+      },
+      "id": "o06-key",
+      "name": "Dedupe Key",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -920,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "neu26q9Q8yfqlkxS",
+          "mode": "list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "dedupe_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.dedupe_key }}"
+            },
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "completed"
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "id": "o07-cache",
+      "name": "Lookup Cached",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -700,
+        240
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.report_json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "o08-ifcache",
+      "name": "Cache Hit?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "message",
+              "value": "Existing assessment reused — zero API calls made.",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "cache_hit",
+              "value": "={{ true }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {
+          "include": "all"
+        }
+      },
+      "id": "o09-cached",
+      "name": "Return Cached",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "neu26q9Q8yfqlkxS",
+          "mode": "list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "dedupe_key",
+              "condition": "eq",
+              "keyValue": "={{ $('Dedupe Key').first().json.dedupe_key }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "dedupe_key": "={{ $('Dedupe Key').first().json.dedupe_key }}",
+            "company": "={{ $('Dedupe Key').first().json.company }}",
+            "objective": "={{ $('Dedupe Key').first().json.objective }}",
+            "status": "processing",
+            "report_version": "v1",
+            "updated_at": "={{ $now.toISO() }}"
+          }
+        }
+      },
+      "id": "o10-processing",
+      "name": "Mark Processing",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -260,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZheMGJPZT8mFX1vf",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "o11-planner",
+      "name": "Call: Research Planner",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Poob3l7cEOa6XBzN",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "o12-collector",
+      "name": "Call: Evidence Collector",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6ThKEi8PbZgoF7H4",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "o13-verifier",
+      "name": "Call: Claim Verifier",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.needs_follow_up }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "o14-iffu",
+      "name": "Needs Follow-Up?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        620,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "follow_up_queries",
+        "options": {}
+      },
+      "id": "o15-split",
+      "name": "Split Follow-Ups",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        840,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Poob3l7cEOa6XBzN",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "o16-collector2",
+      "name": "Call: Collector R2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "m1",
+              "name": "sources",
+              "value": "={{ $json.sources.concat($('Call: Claim Verifier').first().json.sources) }}",
+              "type": "array"
+            },
+            {
+              "id": "m2",
+              "name": "failed_results",
+              "value": "={{ $json.failed_results.concat($('Call: Claim Verifier').first().json.failed_results) }}",
+              "type": "array"
+            },
+            {
+              "id": "m3",
+              "name": "searched_queries",
+              "value": "={{ $('Call: Claim Verifier').first().json.searched_queries }}",
+              "type": "array"
+            },
+            {
+              "id": "m4",
+              "name": "company",
+              "value": "={{ $json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "m5",
+              "name": "objective",
+              "value": "={{ $json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "m6",
+              "name": "dedupe_key",
+              "value": "={{ $json.dedupe_key }}",
+              "type": "string"
+            },
+            {
+              "id": "m7",
+              "name": "round",
+              "value": "1",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {
+          "include": "none"
+        }
+      },
+      "id": "o17-merge",
+      "name": "Merge Evidence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1280,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6ThKEi8PbZgoF7H4",
+          "mode": "id"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "o18-verifier2",
+      "name": "Call: Verifier R2",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1500,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1",
+              "name": "vendor",
+              "value": "={{ $('Dedupe Key').first().json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "f2",
+              "name": "objective",
+              "value": "={{ $('Dedupe Key').first().json.objective }}",
+              "type": "string"
+            },
+            {
+              "id": "f3",
+              "name": "generated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "f4",
+              "name": "status",
+              "value": "={{ $json.downgraded > 0 ? 'degraded' : 'complete' }}",
+              "type": "string"
+            },
+            {
+              "id": "f5",
+              "name": "requires_review",
+              "value": "={{ $json.review_reasons.length > 0 || $json.findings.some(f => ['high','critical'].includes(f.severity)) }}",
+              "type": "boolean"
+            },
+            {
+              "id": "f6",
+              "name": "review_reasons",
+              "value": "={{ $json.review_reasons }}",
+              "type": "array"
+            },
+            {
+              "id": "f7",
+              "name": "findings",
+              "value": "={{ $json.findings }}",
+              "type": "array"
+            },
+            {
+              "id": "f8",
+              "name": "assessment",
+              "value": "={{ $json.assessment }}",
+              "type": "string"
+            },
+            {
+              "id": "f9",
+              "name": "sources_examined",
+              "value": "={{ $json.sources.map(s => s.url) }}",
+              "type": "array"
+            },
+            {
+              "id": "f10",
+              "name": "searched_queries",
+              "value": "={{ $json.searched_queries }}",
+              "type": "array"
+            },
+            {
+              "id": "f11",
+              "name": "failed_extractions",
+              "value": "={{ $json.failed_results }}",
+              "type": "array"
+            },
+            {
+              "id": "f12",
+              "name": "usage",
+              "value": "={{ { model_calls: $json.round > 0 ? 3 : 2, research_rounds: $json.round + 1, searches: $json.searched_queries.length, findings: $json.findings.length } }}",
+              "type": "object"
+            },
+            {
+              "id": "f13",
+              "name": "validator_version",
+              "value": "1.0.0",
+              "type": "string"
+            },
+            {
+              "id": "f14",
+              "name": "model",
+              "value": "MiniMaxAI/MiniMax-M3",
+              "type": "string"
+            },
+            {
+              "id": "f15",
+              "name": "dedupe_key",
+              "value": "={{ $('Dedupe Key').first().json.dedupe_key }}",
+              "type": "string"
+            },
+            {
+              "id": "f16",
+              "name": "report_version",
+              "value": "v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "include": "none"
+        }
+      },
+      "id": "o19-final",
+      "name": "Assemble Report",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1740,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "value": "neu26q9Q8yfqlkxS",
+          "mode": "list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "dedupe_key",
+              "condition": "eq",
+              "keyValue": "={{ $json.dedupe_key }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "dedupe_key": "={{ $json.dedupe_key }}",
+            "company": "={{ $json.vendor }}",
+            "objective": "={{ $json.objective }}",
+            "status": "completed",
+            "report_version": "v1",
+            "report_json": "={{ JSON.stringify($json) }}",
+            "requires_review": "={{ $json.requires_review }}",
+            "review_reasons": "={{ JSON.stringify($json.review_reasons) }}",
+            "updated_at": "={{ $now.toISO() }}"
+          }
+        }
+      },
+      "id": "o20-persist",
+      "name": "Persist Completed",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1960,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('Assemble Report').first().json.requires_review }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "o21-ifreview",
+      "name": "Review Needed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2180,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "OPERATOR@EXAMPLE.COM",
+        "subject": "=VendorProof review required: {{ $('Assemble Report').first().json.vendor }}",
+        "emailType": "text",
+        "message": "={{ 'VendorProof requires review for: ' + $('Assemble Report').first().json.vendor + '\\n\\nReasons: ' + $('Assemble Report').first().json.review_reasons.join(', ') + '\\n\\nAssessment: ' + $('Assemble Report').first().json.assessment.slice(0,1500) + '\\n\\nRetrieve the full report via the lookup form.' }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "o22-gmail",
+      "name": "Operator Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2400,
+        200
+      ],
+      "webhookId": "vp-gmail2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "z1",
+              "name": "done",
+              "value": "={{ true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "z2",
+              "name": "dedupe_key",
+              "value": "={{ $('Assemble Report').first().json.dedupe_key }}",
+              "type": "string"
+            },
+            {
+              "id": "z3",
+              "name": "requires_review",
+              "value": "={{ $('Assemble Report').first().json.requires_review }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {
+          "include": "none"
+        }
+      },
+      "id": "o23-done",
+      "name": "Done",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2620,
+        320
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Assessment Form": {
+      "main": [
+        [
+          {
+            "node": "Normalize Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Input": {
+      "main": [
+        [
+          {
+            "node": "Inputs Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inputs Valid?": {
+      "main": [
+        [
+          {
+            "node": "Fingerprint",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fingerprint": {
+      "main": [
+        [
+          {
+            "node": "Dedupe Key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedupe Key": {
+      "main": [
+        [
+          {
+            "node": "Lookup Cached",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Cached": {
+      "main": [
+        [
+          {
+            "node": "Cache Hit?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cache Hit?": {
+      "main": [
+        [
+          {
+            "node": "Return Cached",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Processing": {
+      "main": [
+        [
+          {
+            "node": "Call: Research Planner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call: Research Planner": {
+      "main": [
+        [
+          {
+            "node": "Call: Evidence Collector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call: Evidence Collector": {
+      "main": [
+        [
+          {
+            "node": "Call: Claim Verifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call: Claim Verifier": {
+      "main": [
+        [
+          {
+            "node": "Needs Follow-Up?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Follow-Up?": {
+      "main": [
+        [
+          {
+            "node": "Split Follow-Ups",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assemble Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Follow-Ups": {
+      "main": [
+        [
+          {
+            "node": "Call: Collector R2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call: Collector R2": {
+      "main": [
+        [
+          {
+            "node": "Merge Evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Evidence": {
+      "main": [
+        [
+          {
+            "node": "Call: Verifier R2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call: Verifier R2": {
+      "main": [
+        [
+          {
+            "node": "Assemble Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Report": {
+      "main": [
+        [
+          {
+            "node": "Persist Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist Completed": {
+      "main": [
+        [
+          {
+            "node": "Review Needed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Needed?": {
+      "main": [
+        [
+          {
+            "node": "Operator Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Operator Alert": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

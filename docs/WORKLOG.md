@@ -184,6 +184,26 @@ Exports in repo: `n8n/vendor-assessment.json` (30 nodes), `n8n/report-retrieval.
 - Follow-up round wired but not yet triggered in 3 runs — verifier's R1 plans are sufficient; gating is honest (no fake rounds).
 - Repo pushed: `github.com/umutyesildal/vendorproof` (initial commit 584f853).
 
+### Iteration round 3 — re-architected to orchestrator + sub-workflows (user request)
+
+User asked for fewer Code nodes and a real sub-workflow architecture. Shipped:
+
+- **Orchestrator** (`gEVx7O2cd5zzeEMt`): Form → Set → IF → Stop and Error → Crypto → Set → Data Table → IF → `Execute Workflow` ×3 (Planner → Collector → Verifier) → IF → Split Out → Collector R2 → Set(merge) → Verifier R2 → Set(assemble) → Data Table → IF → Gmail. **Zero Code nodes.**
+- **Sub: Research Planner** (`ZheMGJPZT8mFX1vf`): trigger → HTTP → Set(JSON.parse) → Split Out → Limit → Set. **Zero Code nodes.**
+- **Sub: Evidence Collector** (`Poob3l7cEOa6XBzN`): trigger → HTTP Search → Split Out → Filter(regex URL) → Remove Duplicates → Limit → Aggregate → HTTP Extract → Set. **Zero Code nodes.**
+- **Sub: Claim Verifier** (`6ThKEi8PbZgoF7H4`): trigger → HTTP Nebius → Code validator (the one place Code is genuinely required — it IS the product differentiator).
+
+Code nodes total: 14 → **3** (validator, retrieval HTML render, error normalizer was also made native-able later if needed).
+
+### Bugs found via live executions and fixed
+
+1. `executeWorkflowTrigger` v1.1 requires `inputSource:'passthrough'` (empty params fail publish).
+2. Webhook path conflict when replacing a live workflow (deactivate old first; v1 renamed "archived").
+3. IF v2.2 numeric `largerEqual`/`smallerEqual` conditions silently failed → single boolean expression condition.
+4. Aggregate node params: `aggregateIndividualFields` + `renameField` (not `aggregateIndividualItem`/`renameOutput`).
+5. **Crypto node does NOT pass input fields through** — output contains only the hash. Company/objective became null downstream and a `company:null` `status:completed` row got persisted, which then poisoned dedupe cache. Fixed by re-deriving fields in the following Set node + upserting the polluted row to `status:stale` via `POST /data-tables/{id}/rows/upsert` (public API rows are insert/upsert only — no delete).
+6. Verified live (exec 27): orchestrator → 3 sub-workflow executions → correct Scale AI report, `requires_review` via severity. Sub-workflow error propagation to error handler also verified (exec 20→21).
+
 ### Remaining blockers (user)
 
 - **Gmail OAuth credential** must be created in n8n UI (browser flow), then enable the 2 disabled Gmail nodes + set operator email.
