@@ -219,12 +219,45 @@ Four parallel submissions (exec 31/33/35/37), all success:
 
 **Exec 51 (Taalas): follow-up loop fired organically** — 3 model calls, 2 research rounds, 12/12 supported after R2. Agentic self-directed re-research verified live.
 
-### Remaining blockers (user)
+### Resolution of remaining blockers
 
-- **Gmail OAuth credential** must be created in n8n UI (browser flow), then enable the 2 disabled Gmail nodes + set operator email.
-- Rotate the API keys shared in chat after the hackathon.
+- **Gmail OAuth completed by user** — credential `v9pqGKjKU1J6Ljr0`; both Gmail nodes enabled; error-path alert delivered with `SENT` label verified via Gmail API (exec 14). Operator email lives only in the live instance — never exported.
+- Heavy test cycle + verifier hardening committed as `005387e` and pushed.
 
-## Entry template
+## 2026-10-18 — Pitch deck generated
+
+### Requested scope
+
+Create pitch deck after system validation.
+
+### Files changed
+
+- `pitch-deck.html` — 8-slide self-contained HTML deck (arrow-key navigation, `N` toggles presenter notes, print-ready).
+- `docs/TASKS.md` — Phase 5 table added; P1-07/P4-03 resolved; confirmations updated.
+
+### Interview answers applied
+
+- Tone: minimal & confident. Visuals: clean white (White + Charcoal palette, blue accent `#2563eb`). Team: `umutyesildal` (solo). Judges unknown → objection prep embedded in presenter notes on slides 2 and 7.
+
+### Deck structure
+
+1. Title — tagline + track badges
+2. Problem — invented citations
+3. Solution — plans / verifies / acts
+4. Architecture — orchestrator + 3 sub-workflows (n8n story)
+5. Demo — live public form URLs
+6. Proof — real test metrics incl. fabricated-vendor test
+7. Differentiation — comparison table ("says I can't verify that")
+8. Ask — "click three citations yourself" + repo link
+
+### Verification performed
+
+- Deck opened in user browser; all slide numbers/metrics traceable to live executions recorded above.
+
+### Follow-up tasks
+
+- 2-minute demo script rehearsal (draft in scope audit).
+- Submission channel + partner-challenge names from organizers.
 
 ```md
 ## YYYY-MM-DD — Short title

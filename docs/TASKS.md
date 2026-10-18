@@ -40,7 +40,7 @@
 | P1-04 | Tavily Extract probe (T-2, T-3) | completed | coordinator | P1-01 | HTTP 200 mixed batch: 1 ok (12 KB markdown) + 1 `failed_results` ("Failed to fetch url"); `GET /usage`: plan "Researcher", 1000 credit limit, counters work |
 | P1-05 | n8n capability probes C-1, C-3..C-10 | completed | coordinator | P1-01 | n8n API live: workflows/credentials/data-tables endpoints OK; empty-Get returns empty item; publish model confirmed; error-workflow requires published version; Code sandbox lacks `URL` global; retryOnFail+stop combo works |
 | P1-06 | Form behavior probe C-2 | completed | coordinator | P1-01 | `onReceived`=async ack + `formSubmittedText`; keys come from `fieldLabel`; retrieval returns `formWaitingUrl` rendering Form Ending page |
-| P1-07 | Gmail OAuth test (C-8) | blocked | user | P1-01 | OAuth must be consented in n8n UI; 2 Gmail nodes exist disabled with OPERATOR@EXAMPLE.COM placeholder |
+| P1-07 | Gmail OAuth test (C-8) | completed | user+coordinator | P1-01 | Credential `v9pqGKjKU1J6Ljr0` authorized; Gmail nodes enabled; real `SENT` delivery verified (exec 14) |
 | P1-08 | Lock architecture after probes | completed | coordinator | P1-05..P1-07 | Architecture locked; live corrections recorded in WORKLOG |
 
 ## Phase 2 — Evidence kernel (after P1-08)
@@ -66,8 +66,20 @@
 |---|---|---|---|
 | P4-01 | Retries on all HTTP calls | completed | coordinator | retryOnFail maxTries=3 waitBetween=3s on all HTTP nodes (stop-on-fail combo per ADR-007) |
 | P4-02 | Zombie-job protection | completed | coordinator | By design: dedupe Get filters status=completed; orphaned `processing` rows never block re-runs |
-| P4-03 | Risk routing + operator Gmail alerts | blocked | user | Nodes exist (disabled); need Gmail OAuth cred + operator email |
+| P4-03 | Risk routing + operator Gmail alerts | completed | user+coordinator | Both Gmail nodes live; error-path alert delivered with `SENT` label (exec 14); review-required alerts verified |
 | P4-04 | Secret-free workflow exports + security checklist | completed | coordinator | Exports contain only credential IDs/names, neutral names, no secrets; scan clean |
+
+## Phase 5 — Native orchestrator redesign (user-requested)
+
+| ID | Task | Status | Owner |
+|---|---|---|---|
+| P5-01 | Orchestrator + 3 published sub-workflows via `Execute Workflow` | completed | coordinator | IDs `gEVx7O2cd5zzeEMt`, `ZheMGJPZT8mFX1vf`, `Poob3l7cEOa6XBzN`, `6ThKEi8PbZgoF7H4`; old monolith `akfIa1WSWLxS5BBS` archived |
+| P5-02 | Reduce Code nodes to product-critical only | completed | coordinator | 14 → 3 Code nodes (validator + HTML render); fan-out runs on native nodes |
+| P5-03 | Bugfix: Crypto node drops input fields | completed | coordinator | Fields reconstructed via Set nodes; polluted row marked `stale` |
+| P5-04 | Load test: 4 parallel submissions | completed | coordinator | OpenAI / Vultr / Weights & Biases / Nimbus — all correct statuses |
+| P5-05 | Fabricated-vendor honesty test | completed | coordinator | "Nimbus Quantum Systems GmbH" → all `insufficient_evidence` + 1 `contradicted`; verifier gating hardened (`005387e`) |
+| P5-06 | Follow-up loop proof | completed | coordinator | Taalas: `research_rounds=2`, `searches=4`, 12 supported findings |
+| P5-07 | Pitch deck (8 slides) + presenter notes | completed | coordinator | `pitch-deck.html`; minimal/clean-white; interview answers applied |
 
 ## Deferred
 
@@ -80,12 +92,10 @@
 
 ## User confirmations still needed
 
-- **Gmail OAuth** in n8n UI → then enable `Operator Alert`/`Alert Operator` nodes and set operator email in both nodes
-- **Operator email address** to replace `OPERATOR@EXAMPLE.COM` in both Gmail nodes
 - Partner-challenge names/requirements (announced at briefing)
 - Submission channel/artifacts
 - Optional: submit to Oct 19 same-venue hackathon and/or online global Devpost (deadline Oct 30)
-- ~~Credentials~~ → received; deadline → confirmed 18:30; Gmail OAuth → ready
+- ~~Credentials~~ → received; deadline → confirmed 18:30; Gmail OAuth → done and verified E2E; pitch deck → generated
 
 ## Coordination notes
 

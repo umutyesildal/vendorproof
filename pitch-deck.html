@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VendorProof — Pitch Deck</title>
+  <style>
+    :root {
+      --c-bg: #ffffff;
+      --c-bg-alt: #fafafa;
+      --c-bg-card: #f6f6f7;
+      --c-surface: #efefef;
+      --c-border: rgba(0,0,0,0.09);
+      --c-primary: #1c1c1e;
+      --c-primary-dim: rgba(28,28,30,0.06);
+      --c-accent: #2563eb;
+      --c-accent-dim: rgba(37,99,235,0.08);
+      --c-danger: #dc2626;
+      --c-warning: #d97706;
+      --c-text: #1c1c1e;
+      --c-text-secondary: rgba(28,28,30,0.68);
+      --c-text-muted: rgba(28,28,30,0.42);
+      --f-hero: 96px;
+      --f-h1: 64px;
+      --f-h2: 48px;
+      --f-h3: 34px;
+      --f-body: 26px;
+      --f-small: 21px;
+      --f-caption: 17px;
+      --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+      --s-xs: 8px; --s-sm: 16px; --s-md: 32px; --s-lg: 48px; --s-xl: 64px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-enter: 0.6s;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; background: var(--c-bg); color: var(--c-text); }
+    .deck { width: 100vw; height: 100vh; position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      justify-content: center; padding: 80px 100px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s var(--ease-out);
+      font-family: var(--font-display); background: var(--c-bg);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.active .animate-in { animation: slideUp var(--duration-enter) var(--ease-out) both; }
+    .slide.active .animate-in:nth-child(1) { animation-delay: 0s; }
+    .slide.active .animate-in:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .animate-in:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .animate-in:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .animate-in:nth-child(5) { animation-delay: 0.32s; }
+    .slide.active .animate-in:nth-child(6) { animation-delay: 0.4s; }
+    .slide.active .animate-in:nth-child(7) { animation-delay: 0.48s; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    .hero { font-size: var(--f-hero); font-weight: 900; letter-spacing: -3px; line-height: 1.05; }
+    .h1 { font-size: var(--f-h1); font-weight: 800; letter-spacing: -2px; line-height: 1.1; }
+    .h2 { font-size: var(--f-h2); font-weight: 700; letter-spacing: -1px; line-height: 1.2; }
+    .h3 { font-size: var(--f-h3); font-weight: 600; line-height: 1.3; }
+    .body { font-size: var(--f-body); line-height: 1.5; color: var(--c-text-secondary); }
+    .small { font-size: var(--f-small); line-height: 1.5; color: var(--c-text-secondary); }
+    .caption { font-size: var(--f-caption); font-weight: 600; color: var(--c-text-muted); letter-spacing: 2px; text-transform: uppercase; }
+    .mono { font-family: var(--font-mono); }
+    .text-accent { color: var(--c-accent); }
+    .text-muted { color: var(--c-text-muted); }
+    .text-danger { color: var(--c-danger); }
+    .text-emphasis { color: var(--c-accent); font-weight: 800; }
+    .flex { display: flex; } .flex-col { flex-direction: column; }
+    .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+    .gap-sm { gap: var(--s-sm); } .gap-md { gap: var(--s-md); } .gap-lg { gap: var(--s-lg); } .gap-xl { gap: var(--s-xl); }
+    .flex-1 { flex: 1; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-lg); }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s-md); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-md); }
+    .card { background: var(--c-bg-card); border: 1px solid var(--c-border); border-radius: 16px; padding: var(--s-lg); }
+    .card-glow { background: var(--c-bg-card); border: 1px solid var(--c-accent); border-radius: 16px; padding: var(--s-lg); box-shadow: 0 0 40px rgba(37,99,235,0.08); }
+    .metric-card { text-align: center; padding: var(--s-lg); }
+    .metric-value { font-size: 72px; font-weight: 900; color: var(--c-accent); letter-spacing: -2px; line-height: 1; }
+    .metric-label { font-size: var(--f-small); color: var(--c-text-muted); margin-top: var(--s-xs); font-weight: 500; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 100px; font-size: var(--f-caption); font-weight: 600; letter-spacing: 1px; }
+    .badge-primary { background: var(--c-primary-dim); color: var(--c-primary); }
+    .badge-accent { background: var(--c-accent-dim); color: var(--c-accent); }
+    .badge-outline { border: 1px solid var(--c-border); color: var(--c-text-secondary); }
+    .divider { width: 64px; height: 3px; border-radius: 2px; background: var(--c-accent); opacity: 0.7; margin: var(--s-md) 0; }
+    .bullet-list { list-style: none; }
+    .bullet-list li { padding: var(--s-sm) 0; padding-left: var(--s-md); position: relative; font-size: var(--f-body); color: var(--c-text-secondary); border-bottom: 1px solid var(--c-border); }
+    .bullet-list li:last-child { border-bottom: none; }
+    .bullet-list li::before { content: ''; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; border-radius: 50%; background: var(--c-accent); transform: translateY(-50%); }
+    .comparison-table { width: 100%; border-collapse: collapse; }
+    .comparison-table th { text-align: left; padding: var(--s-sm) var(--s-md); font-size: var(--f-small); color: var(--c-text-muted); border-bottom: 1px solid var(--c-border); font-weight: 600; }
+    .comparison-table td { padding: var(--s-sm) var(--s-md); font-size: var(--f-body); border-bottom: 1px solid var(--c-border); color: var(--c-text-secondary); }
+    .comparison-table tr.highlight td { color: var(--c-text); background: var(--c-accent-dim); font-weight: 600; }
+    .check { color: var(--c-accent); font-weight: 700; }
+    .cross { color: var(--c-text-muted); }
+    .bg-alt { background: var(--c-bg-alt); }
+    .flow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .flow-node { background: var(--c-bg-card); border: 1px solid var(--c-border); border-radius: 12px; padding: 18px 26px; font-size: var(--f-small); font-weight: 600; }
+    .flow-node.sub { border-color: var(--c-accent); background: var(--c-accent-dim); }
+    .flow-arrow { color: var(--c-text-muted); font-size: 24px; font-weight: 300; }
+    .notes { display: none; position: fixed; bottom: 60px; left: 40px; right: 40px; background: rgba(255,255,255,0.97); border: 1px solid var(--c-border); border-radius: 12px; padding: 20px 24px; font-size: 16px; color: var(--c-text-secondary); line-height: 1.6; z-index: 200; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
+    .notes.visible { display: block; }
+    .notes-label { font-size: 12px; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 40px; background: linear-gradient(0deg, rgba(255,255,255,0.96) 0%, transparent 100%); z-index: 100; opacity: 0; transition: opacity 0.3s; }
+    .deck:hover .nav-bar { opacity: 1; }
+    .nav-counter { font-size: 16px; color: var(--c-text-muted); font-family: var(--font-mono); }
+    .nav-progress { flex: 1; max-width: 200px; height: 3px; border-radius: 2px; background: rgba(0,0,0,0.08); margin: 0 24px; }
+    .nav-progress-fill { height: 100%; border-radius: 2px; background: var(--c-accent); transition: width 0.3s var(--ease-out); }
+    .nav-btn { background: none; border: 1px solid var(--c-border); color: var(--c-text-secondary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: var(--font-display); }
+    .nav-btn:hover { border-color: var(--c-accent); color: var(--c-text); }
+    @media print {
+      .deck { overflow: visible; }
+      .slide { position: relative; opacity: 1; pointer-events: auto; page-break-after: always; height: 100vh; }
+      .nav-bar, .notes { display: none !important; }
+      .animate-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- 1. TITLE -->
+    <div class="slide" style="justify-content: center; align-items: center; text-align: center;">
+      <h1 class="hero animate-in">Vendor<span class="text-accent">Proof</span></h1>
+      <p class="h3 animate-in" style="color: var(--c-text-secondary); margin-top: 24px; max-width: 700px;">
+        Research once. Verify every claim. Monitor what changes.
+      </p>
+      <div class="animate-in" style="margin-top: 48px; display: flex; gap: 16px;">
+        <span class="badge badge-accent">Tavily Agentic Deep Research</span>
+        <span class="badge badge-outline">n8n Award</span>
+        <span class="badge badge-primary">Nebius × NVIDIA Berlin</span>
+      </div>
+      <div class="notes">
+        Bar test: "VendorProof researches a vendor for you — then proves every claim against the actual source before you see it."
+        One breath. Let the badges do the talking.
+      </div>
+    </div>
+
+    <!-- 2. PROBLEM -->
+    <div class="slide bg-alt">
+      <span class="caption animate-in">The Problem</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px; max-width: 950px;">
+        AI research tools <span class="text-danger">invent citations.</span>
+      </h1>
+      <div class="divider animate-in"></div>
+      <ul class="bullet-list animate-in" style="max-width: 800px;">
+        <li>A URL in a report ≠ the claim is true</li>
+        <li>Vendor due diligence needs receipts, not vibes</li>
+        <li>Manual verification takes hours per vendor</li>
+      </ul>
+      <div class="notes">
+        Everyone here has clicked a citation that didn't say what the AI claimed.
+        In vendor due diligence that's not annoying — it's a bad procurement decision.
+        Objection prep: "Isn't this just RAG?" → RAG retrieves text; it doesn't verify the claim against it. We gate on proof.
+      </div>
+    </div>
+
+    <!-- 3. SOLUTION -->
+    <div class="slide">
+      <span class="caption animate-in">The Solution</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px; max-width: 900px;">
+        Every claim carries its evidence —<br>or says it can't.
+      </h1>
+      <div class="divider animate-in"></div>
+      <div class="grid-3 animate-in" style="margin-top: 32px;">
+        <div class="card">
+          <p class="caption" style="color: var(--c-accent);">PLANS</p>
+          <p class="h3" style="margin-top: 12px;">Self-directed research</p>
+          <p class="small" style="margin-top: 8px;">The model decomposes the objective into its own queries — not a fixed script.</p>
+        </div>
+        <div class="card-glow">
+          <p class="caption" style="color: var(--c-accent);">VERIFIES</p>
+          <p class="h3" style="margin-top: 12px;">Deterministic validator</p>
+          <p class="small" style="margin-top: 8px;">A citation only counts if its verbatim quote exists inside the cited source. Downgrades only — never upgrades.</p>
+        </div>
+        <div class="card">
+          <p class="caption" style="color: var(--c-accent);">ACTS</p>
+          <p class="h3" style="margin-top: 12px;">Real automation</p>
+          <p class="small" style="margin-top: 8px;">Dedupe, job tracking, risk alerts, failure recovery — running on n8n right now.</p>
+        </div>
+      </div>
+      <div class="notes">
+        The middle card is the moat. The LLM proposes; deterministic code disposes.
+        "insufficient_evidence" is a first-class honest result — that honesty is the product.
+      </div>
+    </div>
+
+    <!-- 4. ARCHITECTURE (n8n story) -->
+    <div class="slide bg-alt">
+      <span class="caption animate-in">Architecture</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px;">
+        An orchestrator.<br>Three sub-workflows.
+      </h1>
+      <div class="divider animate-in"></div>
+      <div class="animate-in" style="margin-top: 40px;">
+        <div class="flow">
+          <div class="flow-node">Form Trigger</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">Validate + Fingerprint</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">Dedupe Lookup</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node sub">Research Planner</div>
+        </div>
+        <div class="flow" style="margin-top: 16px; padding-left: 120px;">
+          <div class="flow-node sub">Evidence Collector</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node sub">Claim Verifier</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">Follow-up? (max 1 round)</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">Persist + Alert</div>
+        </div>
+        <p class="small text-muted" style="margin-top: 32px;">
+          Nebius MiniMax-M3 plans &amp; verifies · Tavily Search + Extract collects · n8n orchestrates everything · Error workflow logs + alerts
+        </p>
+      </div>
+      <div class="notes">
+        For the n8n judges: this is composition, not scripting. Three published sub-workflows called via Execute Workflow;
+        the entire fan-out pipeline runs on native nodes — Set, Split Out, Filter, Remove Duplicates, Aggregate, Crypto.
+        Only two Code nodes exist, where logic IS the product.
+      </div>
+    </div>
+
+    <!-- 5. DEMO -->
+    <div class="slide">
+      <span class="caption animate-in">Live System</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px;">Running in production. Right now.</h1>
+      <div class="divider animate-in"></div>
+      <div class="grid-2 animate-in" style="margin-top: 32px;">
+        <div class="card">
+          <p class="caption" style="color: var(--c-accent);">SUBMIT</p>
+          <p class="h3" style="margin-top: 12px;">Public form → instant ack</p>
+          <p class="small mono" style="margin-top: 8px;">/form/vp-assessment</p>
+        </div>
+        <div class="card">
+          <p class="caption" style="color: var(--c-accent);">RETRIEVE</p>
+          <p class="h3" style="margin-top: 12px;">Report lookup form</p>
+          <p class="small mono" style="margin-top: 8px;">/form/vp-lookup</p>
+        </div>
+      </div>
+      <ul class="bullet-list animate-in" style="margin-top: 32px; max-width: 800px;">
+        <li>6 real vendor reports already in the table</li>
+        <li>Every failure logged + emailed to operator</li>
+      </ul>
+      <div class="notes">
+        Open the form live if there's wifi. Otherwise: executions show real runs —
+        planner, collector, verifier as separate sub-executions. Show the trace.
+      </div>
+    </div>
+
+    <!-- 6. PROOF -->
+    <div class="slide bg-alt">
+      <span class="caption animate-in">Proof</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px;">Tested against reality —<br>including a fake vendor.</h1>
+      <div class="divider animate-in"></div>
+      <div class="grid-4 animate-in" style="margin-top: 32px;">
+        <div class="metric-card">
+          <div class="metric-value">7</div>
+          <div class="metric-label">E2E vendor assessments</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">0</div>
+          <div class="metric-label">API calls on duplicate request</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">2</div>
+          <div class="metric-label">Research rounds fired autonomously</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">100%</div>
+          <div class="metric-label">Fabricated vendor flagged — zero invention</div>
+        </div>
+      </div>
+      <p class="small text-muted animate-in" style="margin-top: 32px;">
+        "Nimbus Quantum Systems GmbH" doesn't exist → every claim came back <em>insufficient_evidence</em>, plus one <em>contradicted</em> for a different company named Nimbus.
+      </p>
+      <div class="notes">
+        The fake-vendor test is the strongest 10 seconds of the pitch. The system didn't hallucinate a report —
+        it reported honestly and flagged review. That's the whole thesis in one test.
+      </div>
+    </div>
+
+    <!-- 7. DIFFERENTIATION -->
+    <div class="slide">
+      <span class="caption animate-in">Why Not Just…</span>
+      <h1 class="h1 animate-in" style="margin-top: 16px;">Everyone demos research.<br>We ship verification.</h1>
+      <div class="divider animate-in"></div>
+      <table class="comparison-table animate-in" style="margin-top: 32px;">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Research chatbot</th>
+            <th>Search + LLM</th>
+            <th style="color: var(--c-accent);">VendorProof</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Plans its own queries</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Shows citations</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Proves quote ∈ cited source</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Bounded follow-up research</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr class="highlight">
+            <td>Says "I can't verify that"</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="notes">
+        Objection prep: "Isn't Perplexity/the cookbook already this?" → They attach URLs.
+        We deterministically verify the quote lives inside that URL's extracted content, and downgrade otherwise. Monotonic: never upgrades.
+      </div>
+    </div>
+
+    <!-- 8. ASK / CONTACT -->
+    <div class="slide bg-alt" style="justify-content: center; align-items: center; text-align: center;">
+      <span class="caption animate-in">The Ask</span>
+      <h1 class="h2 animate-in" style="margin-top: 24px; max-width: 800px;">
+        Judge it like a jury.<br>Click three citations yourself.
+      </h1>
+      <div class="divider animate-in" style="margin: 32px auto;"></div>
+      <div class="animate-in flex flex-col gap-sm" style="align-items: center;">
+        <p class="body">github.com/<span class="mono">umutyesildal</span>/vendorproof</p>
+        <p class="small text-muted" style="margin-top: 8px;">Built solo today · Nebius + Tavily + n8n</p>
+      </div>
+      <div class="notes">
+        Close on confidence: we ran the honesty test the judges would run.
+        Repo has workflow exports, the validator test suite, and a real report.
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+      <button class="nav-btn" onclick="prev()">← Prev</button>
+      <span class="nav-counter"><span id="current">1</span> / <span id="total"></span></span>
+      <div class="nav-progress"><div class="nav-progress-fill" id="progress"></div></div>
+      <button class="nav-btn" onclick="next()">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let notesVisible = false;
+    document.getElementById('total').textContent = total;
+    function show(i) {
+      slides.forEach(s => s.classList.remove('active'));
+      current = Math.max(0, Math.min(i, total - 1));
+      slides[current].classList.add('active');
+      document.getElementById('current').textContent = current + 1;
+      document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+      document.querySelectorAll('.notes').forEach(n => n.classList.remove('visible'));
+      const note = slides[current].querySelector('.notes');
+      if (note && notesVisible) note.classList.add('visible');
+    }
+    function next() { show(current + 1); }
+    function prev() { show(current - 1); }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      if (e.key === 'n' || e.key === 'N') {
+        notesVisible = !notesVisible;
+        document.querySelectorAll('.notes').forEach(n => {
+          n.classList.toggle('visible', notesVisible && n.closest('.slide').classList.contains('active'));
+        });
+      }
+    });
+    document.getElementById('deck').addEventListener('click', (e) => {
+      if (e.target.closest('.nav-bar') || e.target.closest('.nav-btn')) return;
+      if (e.clientX > window.innerWidth / 2) next(); else prev();
+    });
+    show(0);
+  </script>
+</body>
+</html>
